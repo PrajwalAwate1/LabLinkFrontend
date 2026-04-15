@@ -1,0 +1,112 @@
+<div class="dashboard">
+
+  <header class="header">
+    <div class="header-brand">
+      <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
+        <rect width="40" height="40" rx="10" fill="#0066CC"/>
+        <path d="M12 20h6m0 0v-6m0 6v6m4-12h4a2 2 0 012 2v8a2 2 0 01-2 2h-4"
+              stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="brand-name">LabLink</span>
+    </div>
+    <div class="header-right">
+      <span class="admin-badge">Admin</span>
+      <button class="btn-logout" (click)="logout()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>
+        </svg>
+        Logout
+      </button>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="page-title">
+      <h2>Admin Dashboard</h2>
+      <p>Manage your lab system from one place</p>
+    </div>
+
+    <div class="cards-grid">
+
+      <!-- Manage Users -->
+      <div class="card" (click)="navigateTo('/admin/manage-users')">
+        <div class="card-icon blue">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
+          </svg>
+        </div>
+        <div class="card-body">
+          <h3>Manage Users</h3>
+          <p>Create, update and deactivate system users</p>
+        </div>
+        <div class="card-footer">
+          <span class="open-label">Open</span>
+          <span class="arrow">→</span>
+        </div>
+      </div>
+
+      <!-- Manage Tests -->
+      <div class="card">
+        <div class="card-icon green">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2v-4M9 21H5a2 2 0 01-2-2v-4m0 0h18"/>
+          </svg>
+        </div>
+        <div class="card-body">
+          <h3>Manage Tests</h3>
+          <p>Add and configure available lab tests</p>
+        </div>
+        <div class="card-footer">
+          <span class="coming-soon">Coming Soon</span>
+          <span class="arrow">→</span>
+        </div>
+      </div>
+
+      <!-- Manage Panels -->
+      <div class="card">
+        <div class="card-icon purple">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7" rx="1"/>
+            <rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/>
+            <rect x="14" y="14" width="7" height="7" rx="1"/>
+          </svg>
+        </div>
+        <div class="card-body">
+          <h3>Manage Panels</h3>
+          <p>Group tests into diagnostic panels</p>
+        </div>
+        <div class="card-footer">
+          <span class="coming-soon">Coming Soon</span>
+          <span class="arrow">→</span>
+        </div>
+      </div>
+
+      <!-- View Roles -->
+      <div class="card">
+        <div class="card-icon orange">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <div class="card-body">
+          <h3>View Roles</h3>
+          <p>View all roles assigned in the system</p>
+        </div>
+        <div class="card-footer">
+          <span class="coming-soon">Coming Soon</span>
+          <span class="arrow">→</span>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+</div>
