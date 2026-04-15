@@ -1,0 +1,154 @@
+.dashboard {
+  min-height: 100vh;
+  background: #f4f7fb;
+  font-family: inherit;
+}
+
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 32px;
+  background: #ffffff;
+  border-bottom: 1px solid #e8edf3;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0a1929;
+  letter-spacing: -0.3px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.user-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  background: #e8f4fd;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #0066cc;
+}
+
+.btn-logout {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  background: transparent;
+  border: 1.5px solid #dde3ec;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #637381;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+
+.btn-logout:hover {
+  border-color: #cf1322;
+  color: #cf1322;
+  background: #fff1f0;
+}
+
+.dashboard-main {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 40px 24px;
+}
+
+.welcome-section {
+  margin-bottom: 32px;
+}
+
+.welcome-section h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #0a1929;
+  margin: 0 0 8px;
+}
+
+.welcome-section p {
+  font-size: 15px;
+  color: #637381;
+  margin: 0;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  border: 1px solid #edf0f5;
+  transition: box-shadow 0.2s, transform 0.2s;
+  cursor: pointer;
+}
+
+.card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-content h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #0a1929;
+  margin: 0 0 4px;
+}
+
+.card-content p {
+  font-size: 13px;
+  color: #637381;
+  margin: 0;
+  line-height: 1.5;
+}
+
+@media (max-width: 600px) {
+  .dashboard-header {
+    padding: 12px 16px;
+  }
+
+  .dashboard-main {
+    padding: 24px 16px;
+  }
+
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
