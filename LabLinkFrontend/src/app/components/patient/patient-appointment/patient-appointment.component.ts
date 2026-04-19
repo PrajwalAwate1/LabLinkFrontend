@@ -56,8 +56,6 @@ export class PatientAppointmentComponent implements OnInit {
     });
   }
 
-
-
   loadAppointments(date?: string): void {
     this.isLoading = true;
     this.cdr.detectChanges();
@@ -170,8 +168,6 @@ export class PatientAppointmentComponent implements OnInit {
       }
     });
   }
-
-
 
   openDeleteModal(id: number): void {
     this.deletingId = id;

@@ -54,12 +54,11 @@ export class SignupComponent {
       email: this.email,
       phone: this.phone,
       password: this.password,
-      roleIds: [1]   // default role: Patient
+      roleIds: [1]
     }).subscribe({
       next: (res: any) => {
         const userId: number = res?.data?.userId ?? res?.data?.UserId;
 
-        // Auto-login to get a token, then create the Patient row
         this.authService.login({ email: this.email, password: this.password }).subscribe({
           next: () => {
             this.patientService.upsertPatient({
@@ -67,7 +66,7 @@ export class SignupComponent {
               patientId: null,
               userId: userId,
               name: this.name,
-              dob: '0001-01-01',   // placeholder — patient fills this in My Profile
+              dob: '0001-01-01',
               gender: 'U',
               contactInfo: this.phone,
               address: null,
@@ -75,7 +74,6 @@ export class SignupComponent {
               primaryPhysicianName: null
             }).subscribe({
               next: (patientRes: any) => {
-                // Store patientId so My Profile opens in update mode
                 const pid = patientRes?.data?.patientId ?? patientRes?.data?.PatientId;
                 if (pid) localStorage.setItem('patientId', pid.toString());
                 this.authService.logout();
@@ -84,7 +82,6 @@ export class SignupComponent {
                 setTimeout(() => this.router.navigate(['/login']), 1800);
               },
               error: () => {
-                // Patient row already exists (duplicate UserId) — search to find and store its id
                 this.patientService.searchPatients(this.name, this.phone).subscribe({
                   next: (searchRes: any) => {
                     const existing = searchRes?.data?.find(
@@ -110,7 +107,6 @@ export class SignupComponent {
             });
           },
           error: () => {
-            // Auto-login failed — still succeed the signup
             this.isLoading = false;
             this.successMessage = 'Account created successfully! Redirecting to login...';
             setTimeout(() => this.router.navigate(['/login']), 1800);

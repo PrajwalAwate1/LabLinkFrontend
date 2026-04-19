@@ -80,7 +80,6 @@ export class LoginComponent {
         } else if (response.roles.includes('Phlebotomist')) {
           this.router.navigate(['/phlebotomist']);
         } else {
-          // Patient: look up their patientId and store it before navigating
           this.patientService.searchPatients('', '').subscribe({
             next: (res) => {
               const userId = response.userId;
@@ -91,7 +90,6 @@ export class LoginComponent {
               this.router.navigate(['/patient']);
             },
             error: () => {
-              // Non-critical — navigate anyway; profile page handles missing patientId
               this.router.navigate(['/patient']);
             }
           });
