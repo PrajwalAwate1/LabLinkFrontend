@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { PatientService } from '../../services/patient.service';
 
 @Component({
   selector: 'app-signup',
@@ -21,7 +22,11 @@ export class SignupComponent {
   successMessage = '';
   isLoading = false;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private patientService: PatientService,
+    private router: Router
+  ) {}
 
   onSubmit(): void {
     this.errorMessage = '';
@@ -51,10 +56,66 @@ export class SignupComponent {
       password: this.password,
       roleIds: [1]   // default role: Patient
     }).subscribe({
-      next: () => {
-        this.isLoading = false;
-        this.successMessage = 'Account created successfully! Redirecting to login...';
-        setTimeout(() => this.router.navigate(['/login']), 1800);
+      next: (res: any) => {
+        const userId: number = res?.data?.userId ?? res?.data?.UserId;
+
+        // Auto-login to get a token, then create the Patient row
+        this.authService.login({ email: this.email, password: this.password }).subscribe({
+          next: () => {
+            this.patientService.upsertPatient({
+              isCreate: true,
+              patientId: null,
+              userId: userId,
+              name: this.name,
+              dob: '0001-01-01',   // placeholder — patient fills this in My Profile
+              gender: 'U',
+              contactInfo: this.phone,
+              address: null,
+              isActive: true,
+              primaryPhysicianName: null
+            }).subscribe({
+              next: (patientRes: any) => {
+                // Store patientId so My Profile opens in update mode
+                const pid = patientRes?.data?.patientId ?? patientRes?.data?.PatientId;
+                if (pid) localStorage.setItem('patientId', pid.toString());
+                this.authService.logout();
+                this.isLoading = false;
+                this.successMessage = 'Account created successfully! Redirecting to login...';
+                setTimeout(() => this.router.navigate(['/login']), 1800);
+              },
+              error: () => {
+                // Patient row already exists (duplicate UserId) — search to find and store its id
+                this.patientService.searchPatients(this.name, this.phone).subscribe({
+                  next: (searchRes: any) => {
+                    const existing = searchRes?.data?.find(
+                      (p: any) => p.userId === userId || p.UserId === userId
+                    ) ?? searchRes?.data?.[0];
+                    if (existing) {
+                      const pid = existing.patientId ?? existing.PatientId;
+                      if (pid) localStorage.setItem('patientId', pid.toString());
+                    }
+                    this.authService.logout();
+                    this.isLoading = false;
+                    this.successMessage = 'Account created successfully! Redirecting to login...';
+                    setTimeout(() => this.router.navigate(['/login']), 1800);
+                  },
+                  error: () => {
+                    this.authService.logout();
+                    this.isLoading = false;
+                    this.successMessage = 'Account created successfully! Redirecting to login...';
+                    setTimeout(() => this.router.navigate(['/login']), 1800);
+                  }
+                });
+              }
+            });
+          },
+          error: () => {
+            // Auto-login failed — still succeed the signup
+            this.isLoading = false;
+            this.successMessage = 'Account created successfully! Redirecting to login...';
+            setTimeout(() => this.router.navigate(['/login']), 1800);
+          }
+        });
       },
       error: (err) => {
         this.isLoading = false;
