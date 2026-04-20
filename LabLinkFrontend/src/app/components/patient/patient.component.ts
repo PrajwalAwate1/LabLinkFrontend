@@ -19,6 +19,18 @@ export class PatientComponent implements OnInit {
     this.userId = localStorage.getItem('userId');
   }
 
+  goToTestResults(): void {
+    this.router.navigate(['/patient/test-results']);
+  }
+
+  goToAppointments(): void {
+    this.router.navigate(['/patient/appointments']);
+  }
+
+  goToProfile(): void {
+    this.router.navigate(['/patient/profile']);
+  }
+
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);

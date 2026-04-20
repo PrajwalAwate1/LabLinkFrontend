@@ -17,6 +17,21 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    path: 'patient/profile',
+    loadComponent: () => import('./components/patient/patient-profile/patient-profile.component').then(m => m.PatientProfileComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'patient/appointments',
+    loadComponent: () => import('./components/patient/patient-appointment/patient-appointment.component').then(m => m.PatientAppointmentComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'patient/test-results',
+    loadComponent: () => import('./components/patient/patient-test-results/patient-test-results.component').then(m => m.PatientTestResultsComponent),
+    canActivate: [authGuard]
+  },
+  {
     path: 'admin',
     loadComponent: () => import('./components/admin/admin.component').then(m => m.AdminComponent),
     canActivate: [authGuard]
