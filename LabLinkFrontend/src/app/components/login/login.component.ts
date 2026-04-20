@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { PatientService } from '../../services/patient.service';
 
 @Component({
   selector: 'app-login',
@@ -22,6 +23,7 @@ export class LoginComponent {
 
   constructor(
     private authService: AuthService,
+    private patientService: PatientService,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
@@ -78,7 +80,19 @@ export class LoginComponent {
         } else if (response.roles.includes('Phlebotomist')) {
           this.router.navigate(['/phlebotomist']);
         } else {
-          this.router.navigate(['/patient']);
+          this.patientService.searchPatients('', '').subscribe({
+            next: (res) => {
+              const userId = response.userId;
+              const match = res.data?.find((p) => p.userId === userId || (p as any).UserId === userId);
+              if (match) {
+                localStorage.setItem('patientId', match.patientId.toString());
+              }
+              this.router.navigate(['/patient']);
+            },
+            error: () => {
+              this.router.navigate(['/patient']);
+            }
+          });
         }
       },
       error: (err) => {
