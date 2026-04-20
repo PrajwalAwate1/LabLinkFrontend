@@ -30,7 +30,7 @@
     <div class="cards-grid">
 
       <!-- Manage Appointments -->
-      <div class="card">
+      <div class="card" (click)="goToManageAppointments()">
         <div class="card-icon blue">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -46,13 +46,13 @@
           <p>View, schedule and update patient appointments</p>
         </div>
         <div class="card-footer">
-          <span class="coming-soon">Coming Soon</span>
+          <span class="card-action">Open</span>
           <span class="arrow">→</span>
         </div>
       </div>
 
       <!-- Manage Booking -->
-      <div class="card">
+      <div class="card" (click)="goToManageBooking()">
         <div class="card-icon teal">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -65,13 +65,13 @@
           <p>Handle test bookings and track their status</p>
         </div>
         <div class="card-footer">
-          <span class="coming-soon">Coming Soon</span>
+          <span class="card-action">Open</span>
           <span class="arrow">→</span>
         </div>
       </div>
 
       <!-- Register -->
-      <div class="card">
+      <div class="card" (click)="goToRegisterPatient()">
         <div class="card-icon purple">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -86,7 +86,7 @@
           <p>Register new patients into the system</p>
         </div>
         <div class="card-footer">
-          <span class="coming-soon">Coming Soon</span>
+          <span class="card-action">Open</span>
           <span class="arrow">→</span>
         </div>
       </div>

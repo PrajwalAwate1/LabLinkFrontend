@@ -32,6 +32,26 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    path: 'reception/manage-appointments',
+    loadComponent: () => import('./components/reception/manage-appointments/manage-appointments.component').then(m => m.ManageAppointmentsComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'reception/create-appointment',
+    loadComponent: () => import('./components/reception/create-appointment/create-appointment.component').then(m => m.CreateAppointmentComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'reception/manage-booking',
+    loadComponent: () => import('./components/reception/manage-booking/manage-booking.component').then(m => m.ManageBookingComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'reception/register-patient',
+    loadComponent: () => import('./components/reception/register-patient/register-patient.component').then(m => m.RegisterPatientComponent),
+    canActivate: [authGuard]
+  },
+  {
     path: 'lab-technologist',
     loadComponent: () => import('./components/lab-technologist/lab-technologist.component').then(m => m.LabTechnologistComponent),
     canActivate: [authGuard]

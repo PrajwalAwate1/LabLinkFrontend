@@ -48,30 +48,30 @@ export class LoginComponent {
     // Client-side validation
     if (!this.email.trim()) {
       this.emailError = 'Email is required.';
-      this.cdr.detectChanges();
+      this.cdr.markForCheck();
       return;
     }
     if (!this.isValidEmail(this.email.trim())) {
       this.emailError = 'Please enter a valid email address.';
-      this.cdr.detectChanges();
+      this.cdr.markForCheck();
       return;
     }
     if (!this.password) {
       this.passwordError = 'Password is required.';
-      this.cdr.detectChanges();
+      this.cdr.markForCheck();
       return;
     }
 
     this.isLoading = true;
-    this.cdr.detectChanges();
+    this.cdr.markForCheck();
 
     this.authService.login({ email: this.email.trim(), password: this.password }).subscribe({
       next: (response) => {
         this.isLoading = false;
-        this.cdr.detectChanges();
+        this.cdr.markForCheck();
         if (response.roles.includes('Admin')) {
           this.router.navigate(['/admin']);
-        } else if (response.roles.includes('Reception')) {
+        } else if (response.roles.includes('Receptionist')) {
           this.router.navigate(['/reception']);
         } else if (response.roles.includes('Lab Technologist')) {
           this.router.navigate(['/lab-technologist']);
@@ -99,7 +99,7 @@ export class LoginComponent {
         } else {
           this.generalError = 'Something went wrong. Please try again.';
         }
-        this.cdr.detectChanges();
+        this.cdr.markForCheck();
       }
     });
   }
