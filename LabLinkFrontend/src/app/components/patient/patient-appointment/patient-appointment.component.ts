@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AppointmentService, AppointmentResponse } from '../../../services/appointment.service';
+import { AppointmentService, AppointmentDto, AppointmentResponse } from '../../../services/appointment.service';
 import { AuthService } from '../../../services/auth.service';
 
 declare var bootstrap: any;
@@ -44,7 +44,11 @@ export class PatientAppointmentComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.patientId = Number(localStorage.getItem('patientId')) || null;
+    const storedId = localStorage.getItem('patientId');
+    this.patientId = storedId ? parseInt(storedId, 10) : null;
+    if (this.patientId && isNaN(this.patientId)) {
+      this.patientId = null;
+    }
     this.buildForm();
     this.loadAppointments();
   }
@@ -60,10 +64,10 @@ export class PatientAppointmentComponent implements OnInit {
     this.isLoading = true;
     this.cdr.detectChanges();
     this.appointmentService.getByDate(date).subscribe({
-      next: (res) => {
+      next: (res: { data: AppointmentDto[] }) => {
 
         const pid = this.patientId;
-        this.appointments = (res.data ?? []).filter(a => a.patientId === pid);
+        this.appointments = (res.data ?? []).filter((a: AppointmentDto) => a.patientId === pid);
         this.applyFilter();
         this.isLoading = false;
         this.cdr.detectChanges();
@@ -142,15 +146,24 @@ export class PatientAppointmentComponent implements OnInit {
     this.errorMessage = '';
     this.cdr.detectChanges();
 
+    // Validate patientId before sending
+    if (!this.patientId || isNaN(this.patientId)) {
+      this.errorMessage = 'Patient ID is missing. Please log in again.';
+      this.isSaving = false;
+      this.cdr.detectChanges();
+      return;
+    }
+
+    // Use PascalCase to match backend DTO
     const dto = {
-      patientId: this.patientId!,
-      bookedDateTime: val.bookedDateTime,
-      address: val.address || null,
-      isActive: true
+      PatientId: Number(this.patientId),
+      BookedDateTime: val.bookedDateTime,
+      Address: val.address || null,
+      IsActive: true
     };
 
     const call = this.editingId
-      ? this.appointmentService.update(this.editingId, { ...dto, appointmentId: this.editingId })
+      ? this.appointmentService.update(this.editingId, { ...dto, AppointmentId: this.editingId })
       : this.appointmentService.create(dto);
 
     call.subscribe({

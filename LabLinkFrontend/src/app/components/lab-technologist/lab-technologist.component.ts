@@ -17,4 +17,12 @@ export class LabTechnologistComponent {
     this.authService.logout();
     this.router.navigate(['/login']);
   }
+
+  navigateToSpecimen(): void {
+    this.router.navigate(['/lab-technologist/specimen']);
+  }
+
+  navigateToResultEntry(): void {
+    this.router.navigate(['/lab-technologist/result-entry']);
+  }
 }

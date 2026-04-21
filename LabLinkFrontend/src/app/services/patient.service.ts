@@ -8,11 +8,11 @@ export interface PatientUpsertDto {
   userId: number;
   name: string;
   dob: string; // 'YYYY-MM-DD'
-  gender?: string;
+  gender?: string | null;
   contactInfo: string;
-  address?: string;
+  address?: string | null;
   isActive: boolean;
-  primaryPhysicianName?: string;
+  primaryPhysicianName?: string | null;
 }
 
 export interface PatientResponseDto {
@@ -64,5 +64,18 @@ export class PatientService {
     return this.http.delete<{ message: string }>(
       `${this.baseUrl}/${id}`, { headers: this.headers }
     );
+  }
+
+  // Alias methods for component compatibility
+  upsertPatient(dto: PatientUpsertDto): Observable<{ message: string; data: PatientResponseDto }> {
+    return this.upsert(dto);
+  }
+
+  getPatient(id: number): Observable<{ message: string; data: PatientResponseDto }> {
+    return this.getById(id);
+  }
+
+  searchPatients(name?: string, phone?: string): Observable<{ message: string; data: PatientResponseDto[] }> {
+    return this.list(name, phone);
   }
 }

@@ -15,6 +15,9 @@ export interface AppointmentDto {
   isActive: boolean;
 }
 
+// Alias for component compatibility
+export type AppointmentResponse = AppointmentDto;
+
 @Injectable({ providedIn: 'root' })
 export class AppointmentService {
   private readonly apiUrl = 'http://localhost:5290/api/appointments';
@@ -41,15 +44,20 @@ export class AppointmentService {
     });
   }
 
-  create(dto: Partial<AppointmentDto>): Observable<any> {
+  create(dto: any): Observable<any> {
     return this.http.post(this.apiUrl, dto, { headers: this.headers });
   }
 
-  update(id: number, dto: Partial<AppointmentDto>): Observable<any> {
+  update(id: number, dto: any): Observable<any> {
     return this.http.put(`${this.apiUrl}/${id}`, dto, { headers: this.headers });
   }
 
   delete(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`, { headers: this.headers });
+  }
+
+  // Alias method for component compatibility
+  getByDate(date?: string): Observable<{ data: AppointmentDto[] }> {
+    return this.getAll(date);
   }
 }
