@@ -9,6 +9,7 @@ export interface UserDto {
   email: string | null;
   phone: string | null;
   isActive: boolean;
+  roleIds: number[];
 }
 
 export interface RoleDto {
