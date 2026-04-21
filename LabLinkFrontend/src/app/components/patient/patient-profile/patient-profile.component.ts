@@ -58,7 +58,7 @@ export class PatientProfileComponent implements OnInit {
 
   loadProfile(patientId: number): void {
     this.patientService.getPatient(patientId).subscribe({
-      next: (res) => {
+      next: (res: { message: string; data: PatientResponseDto }) => {
         const p: PatientResponseDto = res.data;
         this.profileForm.patchValue({
           name: p.name ?? '',
@@ -108,11 +108,11 @@ export class PatientProfileComponent implements OnInit {
 
     this.patientService.upsertPatient(dto).pipe(
 
-      switchMap((res) => {
+      switchMap((res: { message: string; data: PatientResponseDto }) => {
         return [res];
       })
     ).subscribe({
-      next: (res) => {
+      next: (res: { message: string; data: PatientResponseDto }) => {
         this.successMessage = res.message;
         if (res.data?.patientId) {
           this.patientId = res.data.patientId;
@@ -121,15 +121,15 @@ export class PatientProfileComponent implements OnInit {
         this.isSaving = false;
         this.cdr.detectChanges();
       },
-      error: (err) => {
+      error: (err: any) => {
 
         if (isCreate && (err.status === 500 || err.status === 409)) {
           this.patientService.searchPatients(formVal.name, '').subscribe({
-            next: (searchRes) => {
+            next: (searchRes: { message: string; data: PatientResponseDto[] }) => {
 
-              const match = searchRes.data?.find((p) => p.userId === this.userId || (p as any).UserId === this.userId)
+              const match = searchRes.data?.find((p: PatientResponseDto) => p.userId === this.userId || (p as any).UserId === this.userId)
                 ?? searchRes.data?.find(
-                  (p) =>
+                  (p: PatientResponseDto) =>
                     p.name?.toLowerCase() === formVal.name?.toLowerCase() &&
                     p.dob?.substring(0, 10) === formVal.dob
                 )

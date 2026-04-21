@@ -44,7 +44,7 @@
         </div>
       </div>
 
-      <div class="card" (click)="goToTestResults()">
+      <div class="card" (click)="openTestResults()">
         <div class="card-icon" style="background:#f0fdf4; color:#16a34a;">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
@@ -69,4 +69,179 @@
       </div>
     </div>
   </main>
+</div>
+
+<!-- Reports List Modal -->
+<div class="modal-overlay" *ngIf="showReportsModal" (click)="closeReportsModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>My Test Reports</h2>
+      <button class="modal-close" (click)="closeReportsModal()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Loading State -->
+      <div *ngIf="loading" class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading reports...</p>
+      </div>
+
+      <!-- Error State -->
+      <div *ngIf="error && !loading" class="error-state">
+        <p>{{ error }}</p>
+      </div>
+
+      <!-- Summary Cards -->
+      <div *ngIf="reportSummary && !loading" class="report-summary">
+        <div class="summary-card total">
+          <span class="summary-number">{{ reportSummary.totalReports }}</span>
+          <span class="summary-label">Total Reports</span>
+        </div>
+        <div class="summary-card reviewed">
+          <span class="summary-number">{{ reportSummary.reviewedReports }}</span>
+          <span class="summary-label">Reviewed</span>
+        </div>
+        <div class="summary-card pending">
+          <span class="summary-number">{{ reportSummary.pendingReports }}</span>
+          <span class="summary-label">Pending</span>
+        </div>
+      </div>
+
+      <!-- Reports List -->
+      <div *ngIf="reportSummary && !loading" class="reports-list">
+        <div *ngIf="reportSummary.reports.length === 0" class="empty-state">
+          <p>No test reports found.</p>
+        </div>
+
+        <div *ngFor="let report of reportSummary.reports" class="report-card" (click)="viewReportDetail(report.orderId)">
+          <div class="report-info">
+            <div class="report-header">
+              <span class="order-id">Order #{{ report.orderId }}</span>
+              <span class="report-status" [class.reviewed]="report.isReviewed" [class.pending]="!report.isReviewed">
+                {{ report.status }}
+              </span>
+            </div>
+            <div class="report-meta">
+              <span>{{ formatDate(report.orderDate) }}</span>
+              <span *ngIf="report.testResults.length">{{ report.testResults.length }} test(s)</span>
+            </div>
+          </div>
+          <svg class="chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 18l6-6-6-6"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Report Detail Modal -->
+<div class="modal-overlay" *ngIf="showReportDetailModal" (click)="closeReportDetailModal()">
+  <div class="modal-content modal-large" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <button class="back-btn" (click)="backToReportsList()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M15 18l-6-6 6-6"/>
+        </svg>
+        Back
+      </button>
+      <h2>Report Details</h2>
+      <div class="header-actions-modal">
+        <button class="download-btn" (click)="downloadReport()" *ngIf="selectedReport">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+          </svg>
+          Download
+        </button>
+        <button class="modal-close" (click)="closeReportDetailModal()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6L6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="modal-body">
+      <!-- Loading State -->
+      <div *ngIf="loading" class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading report details...</p>
+      </div>
+
+      <!-- Report Content -->
+      <div *ngIf="selectedReport && !loading" class="report-detail">
+        <!-- Report Info -->
+        <div class="report-info-header">
+          <div class="info-row">
+            <span class="label">Order ID:</span>
+            <span class="value">#{{ selectedReport.orderId }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Order Date:</span>
+            <span class="value">{{ formatDate(selectedReport.orderDate) }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Status:</span>
+            <span class="value status-badge" [class.reviewed]="selectedReport.isReviewed">
+              {{ selectedReport.status }}
+            </span>
+          </div>
+          <div class="info-row" *ngIf="selectedReport.reviewedBy">
+            <span class="label">Reviewed By:</span>
+            <span class="value">{{ selectedReport.reviewedBy }}</span>
+          </div>
+          <div class="info-row" *ngIf="selectedReport.reviewDate">
+            <span class="label">Review Date:</span>
+            <span class="value">{{ formatDate(selectedReport.reviewDate) }}</span>
+          </div>
+        </div>
+
+        <!-- Pathologist Notes -->
+        <div *ngIf="selectedReport.reviewNotes" class="review-notes">
+          <h4>Pathologist Notes</h4>
+          <p>{{ selectedReport.reviewNotes }}</p>
+        </div>
+
+        <!-- Test Results Table -->
+        <div class="results-section">
+          <h4>Test Results</h4>
+          <div class="results-table-wrapper">
+            <table class="results-table">
+              <thead>
+                <tr>
+                  <th>Test Name</th>
+                  <th>Result</th>
+                  <th>Units</th>
+                  <th>Normal Range</th>
+                  <th>Flag</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let result of selectedReport.testResults">
+                  <td>
+                    <div class="test-name">{{ result.testName }}</div>
+                    <div class="test-code">{{ result.testCode }}</div>
+                  </td>
+                  <td class="result-value">{{ result.value || 'Pending' }}</td>
+                  <td>{{ result.units || '-' }}</td>
+                  <td>{{ result.normalRange }}</td>
+                  <td>
+                    <span *ngIf="result.flag" class="flag-badge" [ngClass]="getFlagClass(result.flag)">
+                      {{ result.flag }}
+                    </span>
+                    <span *ngIf="!result.flag && result.value">-</span>
+                    <span *ngIf="!result.value">Pending</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

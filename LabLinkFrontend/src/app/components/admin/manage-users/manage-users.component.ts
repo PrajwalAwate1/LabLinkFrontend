@@ -59,11 +59,11 @@ export class ManageUsersComponent implements OnInit {
     this.userService.getRoles().subscribe({
       next: (roles) => {
         this.roles = roles;
-        this.cdr.detectChanges();
+        this.cdr.markForCheck();
       },
       error: () => {
         this.roles = [];
-        this.cdr.detectChanges();
+        this.cdr.markForCheck();
       }
     });
   }
@@ -71,13 +71,13 @@ export class ManageUsersComponent implements OnInit {
   loadUsers(): void {
     this.loading = true;
     this.error = '';
-    this.cdr.detectChanges();
+    this.cdr.markForCheck();
 
     this.userService.getUsers(this.searchName || undefined, this.searchPhone || undefined).subscribe({
       next: (users) => {
         this.users = users;
         this.loading = false;
-        this.cdr.detectChanges();
+        this.cdr.markForCheck();
       },
       error: (err) => {
         // 404 means no users found — treat as empty list, not a hard error
@@ -87,17 +87,17 @@ export class ManageUsersComponent implements OnInit {
           this.error = err.error?.message || 'Failed to load users.';
         }
         this.loading = false;
-        this.cdr.detectChanges();
+        this.cdr.markForCheck();
       }
     });
   }
 
   showSuccess(msg: string): void {
     this.successMessage = msg;
-    this.cdr.detectChanges();
+    this.cdr.markForCheck();
     setTimeout(() => {
       this.successMessage = '';
-      this.cdr.detectChanges();
+      this.cdr.markForCheck();
     }, 3500);
   }
 
@@ -117,7 +117,7 @@ export class ManageUsersComponent implements OnInit {
     this.form = { name: '', email: '', phone: '', password: '', isActive: true, roleIds: [] };
     this.formError = '';
     this.showModal = true;
-    this.cdr.detectChanges();
+    this.cdr.markForCheck();
   }
 
   openEditModal(user: UserDto): void {
@@ -129,16 +129,16 @@ export class ManageUsersComponent implements OnInit {
       phone: user.phone || '',
       password: '',
       isActive: user.isActive,
-      roleIds: []
+      roleIds: [...(user.roleIds ?? [])]
     };
     this.formError = '';
     this.showModal = true;
-    this.cdr.detectChanges();
+    this.cdr.markForCheck();
   }
 
   closeModal(): void {
     this.showModal = false;
-    this.cdr.detectChanges();
+    this.cdr.markForCheck();
   }
 
   toggleRole(roleId: number): void {
@@ -148,7 +148,7 @@ export class ManageUsersComponent implements OnInit {
     } else {
       this.form.roleIds.splice(idx, 1);
     }
-    this.cdr.detectChanges();
+    this.cdr.markForCheck();
   }
 
   hasRole(roleId: number): boolean {
@@ -158,17 +158,17 @@ export class ManageUsersComponent implements OnInit {
   submitForm(): void {
     this.formError = '';
 
-    if (!this.form.name.trim()) { this.formError = 'Name is required.'; this.cdr.detectChanges(); return; }
-    if (!this.isEditMode && !this.form.email.trim()) { this.formError = 'Email is required.'; this.cdr.detectChanges(); return; }
-    if (!this.form.phone.trim()) { this.formError = 'Phone is required.'; this.cdr.detectChanges(); return; }
-    if (!this.isEditMode && !this.form.password) { this.formError = 'Password is required.'; this.cdr.detectChanges(); return; }
+    if (!this.form.name.trim()) { this.formError = 'Name is required.'; this.cdr.markForCheck(); return; }
+    if (!this.isEditMode && !this.form.email.trim()) { this.formError = 'Email is required.'; this.cdr.markForCheck(); return; }
+    if (!this.form.phone.trim()) { this.formError = 'Phone is required.'; this.cdr.markForCheck(); return; }
+    if (!this.isEditMode && !this.form.password) { this.formError = 'Password is required.'; this.cdr.markForCheck(); return; }
     if (this.form.password && (this.form.password.length < 8 || this.form.password.length > 20)) {
-      this.formError = 'Password must be 8–20 characters.'; this.cdr.detectChanges(); return;
+      this.formError = 'Password must be 8–20 characters.'; this.cdr.markForCheck(); return;
     }
-    if (this.form.roleIds.length === 0) { this.formError = 'Select at least one role.'; this.cdr.detectChanges(); return; }
+    if (this.form.roleIds.length === 0) { this.formError = 'Select at least one role.'; this.cdr.markForCheck(); return; }
 
     this.formLoading = true;
-    this.cdr.detectChanges();
+    this.cdr.markForCheck();
 
     if (this.isEditMode && this.editUserId !== null) {
       const payload: UserUpdateRequest = {
@@ -183,14 +183,14 @@ export class ManageUsersComponent implements OnInit {
         next: () => {
           this.formLoading = false;
           this.showModal = false;
-          this.cdr.detectChanges();
+          this.cdr.markForCheck();
           this.showSuccess('User updated successfully.');
           this.loadUsers();
         },
         error: (err) => {
           this.formError = err.error?.message || 'Failed to update user.';
           this.formLoading = false;
-          this.cdr.detectChanges();
+          this.cdr.markForCheck();
         }
       });
     } else {
@@ -206,14 +206,14 @@ export class ManageUsersComponent implements OnInit {
         next: () => {
           this.formLoading = false;
           this.showModal = false;
-          this.cdr.detectChanges();
+          this.cdr.markForCheck();
           this.showSuccess('User created successfully.');
           this.loadUsers();
         },
         error: (err) => {
           this.formError = err.error?.message || 'Failed to create user.';
           this.formLoading = false;
-          this.cdr.detectChanges();
+          this.cdr.markForCheck();
         }
       });
     }
@@ -223,27 +223,27 @@ export class ManageUsersComponent implements OnInit {
     this.deleteUserId = user.userId;
     this.deleteUserName = user.name;
     this.showDeleteConfirm = true;
-    this.cdr.detectChanges();
+    this.cdr.markForCheck();
   }
 
   cancelDelete(): void {
     this.showDeleteConfirm = false;
     this.deleteUserId = null;
     this.deleteUserName = '';
-    this.cdr.detectChanges();
+    this.cdr.markForCheck();
   }
 
   executeDelete(): void {
     if (!this.deleteUserId) return;
     this.deleteLoading = true;
-    this.cdr.detectChanges();
+    this.cdr.markForCheck();
 
     this.userService.deleteUser(this.deleteUserId).subscribe({
       next: () => {
         this.deleteLoading = false;
         this.showDeleteConfirm = false;
         this.deleteUserId = null;
-        this.cdr.detectChanges();
+        this.cdr.markForCheck();
         this.showSuccess('User deleted successfully.');
         this.loadUsers();
       },
@@ -251,7 +251,7 @@ export class ManageUsersComponent implements OnInit {
         this.error = err.error?.message || 'Failed to delete user.';
         this.deleteLoading = false;
         this.showDeleteConfirm = false;
-        this.cdr.detectChanges();
+        this.cdr.markForCheck();
       }
     });
   }
