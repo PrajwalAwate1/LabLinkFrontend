@@ -17,4 +17,16 @@ export class ReceptionComponent {
     this.authService.logout();
     this.router.navigate(['/login']);
   }
+
+  goToManageAppointments(): void {
+    this.router.navigate(['/reception/manage-appointments']);
+  }
+
+  goToManageBooking(): void {
+    this.router.navigate(['/reception/manage-booking']);
+  }
+
+  goToRegisterPatient(): void {
+    this.router.navigate(['/reception/register-patient']);
+  }
 }

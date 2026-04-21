@@ -1,0 +1,210 @@
+<div class="page">
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-brand">
+      <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
+        <rect width="40" height="40" rx="10" fill="#0066CC"/>
+        <path d="M12 20h6m0 0v-6m0 6v6m4-12h4a2 2 0 012 2v8a2 2 0 01-2 2h-4"
+              stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="brand-name">LabLink</span>
+    </div>
+    <div class="header-right">
+      <span class="reception-badge">Reception</span>
+      <button class="btn-back" (click)="goBack()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 12H5M12 5l-7 7 7 7"/>
+        </svg>
+        Back to Appointments
+      </button>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="main">
+
+    <!-- Success Banner -->
+    <div class="success-banner" *ngIf="successMessage">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+      {{ successMessage }}
+    </div>
+
+    <!-- Error Banner -->
+    <div class="error-banner" *ngIf="error">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      {{ error }}
+    </div>
+
+    <!-- Appointment Form (when patient selected) -->
+    <div class="appointment-form-card" *ngIf="showForm && selectedPatient">
+      <div class="form-card-header">
+        <div>
+          <h2>Create Appointment</h2>
+          <p>Scheduling for <strong>{{ selectedPatient.name }}</strong> (ID: {{ selectedPatient.patientId }})</p>
+        </div>
+        <button class="btn-ghost" (click)="cancelForm()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+          Cancel
+        </button>
+      </div>
+
+      <div class="error-banner" *ngIf="formError">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        {{ formError }}
+      </div>
+
+      <div class="patient-summary">
+        <div class="summary-item">
+          <span class="summary-label">Patient</span>
+          <span class="summary-value">{{ selectedPatient.name }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Gender</span>
+          <span class="summary-value">{{ selectedPatient.gender || '—' }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Contact</span>
+          <span class="summary-value">{{ selectedPatient.contactInfo || '—' }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">DOB</span>
+          <span class="summary-value">{{ formatDate(selectedPatient.dob) }}</span>
+        </div>
+      </div>
+
+      <div class="form-fields">
+        <div class="form-group">
+          <label>Date &amp; Time <span class="required">*</span></label>
+          <input type="datetime-local" [(ngModel)]="form.bookedDateTime" class="form-input"/>
+        </div>
+
+        <div class="form-group">
+          <label>Address <span class="required">*</span></label>
+          <input type="text" [(ngModel)]="form.address" placeholder="e.g. 123 Main St" class="form-input"/>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group toggle-group">
+            <label>Active</label>
+            <label class="toggle">
+              <input type="checkbox" [(ngModel)]="form.isActive"/>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn-ghost" (click)="cancelForm()">Cancel</button>
+        <button class="btn-primary" (click)="createAppointment()" [disabled]="formLoading">
+          <span *ngIf="formLoading" class="btn-spinner"></span>
+          Create Appointment
+        </button>
+      </div>
+    </div>
+
+    <!-- Patient List (when no patient selected) -->
+    <div *ngIf="!showForm">
+      <div class="page-title-row">
+        <div>
+          <h2>Select a Patient</h2>
+          <p>Choose a patient from the list to create an appointment</p>
+        </div>
+      </div>
+
+      <!-- Search Bar -->
+      <div class="filter-bar">
+        <div class="filter-field">
+          <svg class="filter-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="text" [(ngModel)]="searchName" class="filter-input" placeholder="Search by name..."/>
+        </div>
+        <div class="filter-field">
+          <svg class="filter-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72"/>
+          </svg>
+          <input type="text" [(ngModel)]="searchPhone" class="filter-input" placeholder="Search by phone..."/>
+        </div>
+        <button class="btn-search" (click)="applySearch()">Search</button>
+        <button class="btn-clear" (click)="clearSearch()">Clear</button>
+      </div>
+
+      <!-- Loading -->
+      <div class="loading-state" *ngIf="loading">
+        <div class="spinner"></div>
+        <span>Loading patients...</span>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="!loading && patients.length === 0 && !error">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c0cdd8"
+             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 00-3-3.87"/>
+          <path d="M16 3.13a4 4 0 010 7.75"/>
+        </svg>
+        <p>No patients found. Try a different search or register a new patient first.</p>
+      </div>
+
+      <!-- Patient Cards -->
+      <div class="patient-grid" *ngIf="!loading && patients.length > 0">
+        <div class="patient-card" *ngFor="let patient of patients" (click)="selectPatient(patient)">
+          <div class="patient-card-top">
+            <div class="avatar-lg">{{ patient.name.charAt(0).toUpperCase() }}</div>
+            <div class="patient-info">
+              <h4>{{ patient.name }}</h4>
+              <span class="patient-id">ID: {{ patient.patientId }}</span>
+            </div>
+            <span class="status-badge" [class.active]="patient.isActive" [class.inactive]="!patient.isActive">
+              {{ patient.isActive ? 'Active' : 'Inactive' }}
+            </span>
+          </div>
+          <div class="patient-card-details">
+            <div class="detail-item">
+              <span class="detail-label">Gender</span>
+              <span>{{ patient.gender || '—' }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">DOB</span>
+              <span>{{ formatDate(patient.dob) }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Contact</span>
+              <span>{{ patient.contactInfo || '—' }}</span>
+            </div>
+          </div>
+          <div class="patient-card-action">
+            <button class="btn-select">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+              Create Appointment
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>

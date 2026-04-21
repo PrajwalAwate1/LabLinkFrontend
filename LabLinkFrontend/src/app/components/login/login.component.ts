@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { PatientService } from '../../services/patient.service';
 
 @Component({
   selector: 'app-login',
@@ -22,6 +23,7 @@ export class LoginComponent {
 
   constructor(
     private authService: AuthService,
+    private patientService: PatientService,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
@@ -48,27 +50,27 @@ export class LoginComponent {
     // Client-side validation
     if (!this.email.trim()) {
       this.emailError = 'Email is required.';
-      this.cdr.detectChanges();
+      this.cdr.markForCheck();
       return;
     }
     if (!this.isValidEmail(this.email.trim())) {
       this.emailError = 'Please enter a valid email address.';
-      this.cdr.detectChanges();
+      this.cdr.markForCheck();
       return;
     }
     if (!this.password) {
       this.passwordError = 'Password is required.';
-      this.cdr.detectChanges();
+      this.cdr.markForCheck();
       return;
     }
 
     this.isLoading = true;
-    this.cdr.detectChanges();
+    this.cdr.markForCheck();
 
     this.authService.login({ email: this.email.trim(), password: this.password }).subscribe({
       next: (response) => {
         this.isLoading = false;
-        this.cdr.detectChanges();
+        this.cdr.markForCheck();
         if (response.roles.includes('Admin')) {
           this.router.navigate(['/admin']);
         } else if (response.roles.includes('Reception')) {
@@ -80,9 +82,34 @@ export class LoginComponent {
         } else if (response.roles.includes('Pathologist')) {
           this.router.navigate(['/pathologist']);
         } else if (response.roles.includes('Patient')) {
-          this.router.navigate(['/patient']);
+          // Fetch and store patientId for Patient role
+          const userId = response.userId;
+          this.patientService.searchPatients('', '').subscribe({
+            next: (res) => {
+              const match = res.data?.find((p) => p.userId === userId || (p as any).UserId === userId);
+              if (match) {
+                localStorage.setItem('patientId', String(match.patientId));
+              }
+              this.router.navigate(['/patient']);
+            },
+            error: () => {
+              this.router.navigate(['/patient']);
+            }
+          });
         } else {
-          this.router.navigate(['/patient']);
+          this.patientService.searchPatients('', '').subscribe({
+            next: (res) => {
+              const userId = response.userId;
+              const match = res.data?.find((p) => p.userId === userId || (p as any).UserId === userId);
+              if (match) {
+                localStorage.setItem('patientId', String(match.patientId));
+              }
+              this.router.navigate(['/patient']);
+            },
+            error: () => {
+              this.router.navigate(['/patient']);
+            }
+          });
         }
       },
       error: (err) => {
@@ -103,7 +130,7 @@ export class LoginComponent {
         } else {
           this.generalError = 'Something went wrong. Please try again.';
         }
-        this.cdr.detectChanges();
+        this.cdr.markForCheck();
       }
     });
   }

@@ -17,6 +17,21 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    path: 'patient/profile',
+    loadComponent: () => import('./components/patient/patient-profile/patient-profile.component').then(m => m.PatientProfileComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'patient/appointments',
+    loadComponent: () => import('./components/patient/patient-appointment/patient-appointment.component').then(m => m.PatientAppointmentComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'patient/test-results',
+    loadComponent: () => import('./components/patient/patient-test-results/patient-test-results.component').then(m => m.PatientTestResultsComponent),
+    canActivate: [authGuard]
+  },
+  {
     path: 'admin',
     loadComponent: () => import('./components/admin/admin.component').then(m => m.AdminComponent),
     canActivate: [authGuard]
@@ -29,6 +44,26 @@ export const routes: Routes = [
   {
     path: 'reception',
     loadComponent: () => import('./components/reception/reception.component').then(m => m.ReceptionComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'reception/manage-appointments',
+    loadComponent: () => import('./components/reception/manage-appointments/manage-appointments.component').then(m => m.ManageAppointmentsComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'reception/create-appointment',
+    loadComponent: () => import('./components/reception/create-appointment/create-appointment.component').then(m => m.CreateAppointmentComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'reception/manage-booking',
+    loadComponent: () => import('./components/reception/manage-booking/manage-booking.component').then(m => m.ManageBookingComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'reception/register-patient',
+    loadComponent: () => import('./components/reception/register-patient/register-patient.component').then(m => m.RegisterPatientComponent),
     canActivate: [authGuard]
   },
   {
