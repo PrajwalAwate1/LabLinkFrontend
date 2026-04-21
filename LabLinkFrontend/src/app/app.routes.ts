@@ -37,9 +37,25 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    path: 'lab-technologist/specimen',
+    loadComponent: () => import('./components/lab-technologist/manage-specimen/manage-specimen.component').then(m => m.ManageSpecimenComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'lab-technologist/result-entry',
+    loadComponent: () => import('./components/lab-technologist/manage-result-entry/manage-result-entry.component').then(m => m.ManageResultEntryComponent),
+    canActivate: [authGuard]
+  },
+  {
     path: 'phlebotomist',
     loadComponent: () => import('./components/phlebotomist/phlebotomist.component').then(m => m.PhlebotomistComponent),
     canActivate: [authGuard]
   },
+  {
+    path: 'pathologist',
+    loadComponent: () => import('./components/pathologist/pathologist.component').then(m => m.PathologistComponent),
+    canActivate: [authGuard]
+  },
   { path: '**', redirectTo: 'login' }
 ];
+

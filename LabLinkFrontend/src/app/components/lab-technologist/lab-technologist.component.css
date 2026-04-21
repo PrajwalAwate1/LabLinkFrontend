@@ -164,6 +164,24 @@
   border-radius: 20px;
 }
 
+.active-link {
+  font-size: 12px;
+  font-weight: 600;
+  color: #0066cc;
+  background: #e8f4fd;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+.card.clickable {
+  cursor: pointer;
+}
+
+.card.clickable:hover .active-link {
+  background: #0066cc;
+  color: white;
+}
+
 .arrow {
   font-size: 18px;
   color: #c0cdd8;

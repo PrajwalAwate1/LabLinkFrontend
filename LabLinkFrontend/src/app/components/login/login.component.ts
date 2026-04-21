@@ -77,6 +77,10 @@ export class LoginComponent {
           this.router.navigate(['/lab-technologist']);
         } else if (response.roles.includes('Phlebotomist')) {
           this.router.navigate(['/phlebotomist']);
+        } else if (response.roles.includes('Pathologist')) {
+          this.router.navigate(['/pathologist']);
+        } else if (response.roles.includes('Patient')) {
+          this.router.navigate(['/patient']);
         } else {
           this.router.navigate(['/patient']);
         }

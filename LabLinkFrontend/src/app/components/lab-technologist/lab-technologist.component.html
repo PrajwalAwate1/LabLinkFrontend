@@ -30,7 +30,7 @@
     <div class="cards-grid">
 
       <!-- Manage Specimen -->
-      <div class="card">
+      <div class="card clickable" (click)="navigateToSpecimen()">
         <div class="card-icon blue">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -43,13 +43,13 @@
           <p>Track and process collected patient specimens</p>
         </div>
         <div class="card-footer">
-          <span class="coming-soon">Coming Soon</span>
+          <span class="active-link">View Specimens</span>
           <span class="arrow">→</span>
         </div>
       </div>
 
       <!-- Manage Result Entry -->
-      <div class="card">
+      <div class="card clickable" (click)="navigateToResultEntry()">
         <div class="card-icon green">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -62,7 +62,7 @@
           <p>Enter and verify lab test results for patients</p>
         </div>
         <div class="card-footer">
-          <span class="coming-soon">Coming Soon</span>
+          <span class="active-link">Enter Results</span>
           <span class="arrow">→</span>
         </div>
       </div>
