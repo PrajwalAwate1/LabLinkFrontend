@@ -68,7 +68,7 @@ export class LoginComponent {
 
     this.authService.login({ email: this.email.trim(), password: this.password }).subscribe({
       next: (response) => {
-        localStorage.setItem('userEmail', this.email.trim());
+        localStorage.setItem('userName', response.name);
         
         this.isLoading = false;
         this.cdr.markForCheck();

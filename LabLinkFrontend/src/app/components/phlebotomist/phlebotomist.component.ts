@@ -49,8 +49,7 @@ export class PhlebotomistComponent implements OnInit {
       this.userId = parseInt(userIdStr, 10);
     }
     
-    const email = localStorage.getItem('userEmail') || '';
-    this.userName = email.split('@')[0] || 'Unknown User';
+    this.userName = localStorage.getItem('userName') || 'Unknown User';
     
     this.selectedDate = new Date().toISOString().split('T')[0];
     this.loadOrders();
@@ -236,11 +235,7 @@ export class PhlebotomistComponent implements OnInit {
   getUserName(userId: number | undefined): string {
     if (!userId) return 'Unknown';
     if (userId === this.userId) {
-      const nameParts = this.userName.split('.');
-      const formattedName = nameParts
-        .map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
-        .join(' ');
-      return formattedName;
+      return this.userName;
     }
     return `User ID: ${userId}`;
   }
