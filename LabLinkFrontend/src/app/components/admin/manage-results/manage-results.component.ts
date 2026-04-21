@@ -2,7 +2,7 @@ import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ResultEntryService, ResultEntryDto } from '../../../services/result-entry.service';
+import { ResultEntryService, ResultEntry } from '../../../services/result-entry.service';
 
 @Component({
   selector: 'app-manage-results',
@@ -12,7 +12,7 @@ import { ResultEntryService, ResultEntryDto } from '../../../services/result-ent
   styleUrl: './manage-results.component.css'
 })
 export class ManageResultsComponent {
-  results: ResultEntryDto[] = [];
+  results: ResultEntry[] = [];
   loading = false;
   error = '';
 

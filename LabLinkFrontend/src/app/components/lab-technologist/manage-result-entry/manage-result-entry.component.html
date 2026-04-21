@@ -1,0 +1,290 @@
+<div class="page-container">
+  <header class="page-header">
+    <button class="btn-back" (click)="goBack()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      Back
+    </button>
+    <h1>
+      @switch (currentView()) {
+        @case ('orders') { <span>Lab Orders</span> }
+        @case ('orderDetail') { <span>Order #{{ selectedOrder()?.orderId }} - Order Items</span> }
+        @case ('resultEntry') { <span>Enter Result - {{ selectedOrderItem()?.testName }}</span> }
+      }
+    </h1>
+  </header>
+
+  @if (success()) {
+    <div class="alert success">{{ success() }}</div>
+  }
+  @if (error()) {
+    <div class="alert error">{{ error() }}</div>
+  }
+
+  <!-- ORDERS LIST VIEW -->
+  @if (currentView() === 'orders') {
+    <div class="search-bar">
+      <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/>
+        <path d="M21 21l-4.35-4.35"/>
+      </svg>
+      <input 
+        type="text" 
+        [value]="searchOrderId()"
+        (input)="updateSearchOrderId($any($event.target).value)"
+        placeholder="Filter by Order ID or Patient Name..."
+        class="search-input"
+      />
+    </div>
+
+    <div class="content">
+      @if (loading()) {
+        <div class="loading">
+          <div class="spinner"></div>
+          Loading orders...
+        </div>
+      }
+
+      @if (!loading() && filteredOrders().length === 0) {
+        <div class="empty-state">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5">
+            <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+          <p>No orders found</p>
+        </div>
+      }
+
+      @if (!loading() && filteredOrders().length > 0) {
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Patient</th>
+              <th>Order Date</th>
+              <th>Priority</th>
+              <th>Total Items</th>
+              <th>Pending Results</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (order of filteredOrders(); track order.orderId) {
+              <tr>
+                <td class="order-id">#{{ order.orderId }}</td>
+                <td>{{ order.patientName || 'N/A' }}</td>
+                <td>{{ formatDate(order.orderDate) }}</td>
+                <td>
+                  <span class="priority-badge" [ngClass]="getPriorityClass(order.priority)">
+                    {{ getPriorityLabel(order.priority) }}
+                  </span>
+                </td>
+                <td>{{ order.orderItemCount }}</td>
+                <td>
+                  <span class="pending-badge" [class.complete]="order.pendingResultCount === 0">
+                    {{ order.pendingResultCount === 0 ? 'Complete' : order.pendingResultCount + ' pending' }}
+                  </span>
+                </td>
+                <td>
+                  <span class="status-badge" [class.active]="order.isActive" [class.inactive]="!order.isActive">
+                    {{ order.isActive ? 'Active' : 'Inactive' }}
+                  </span>
+                </td>
+                <td class="actions">
+                  <button class="btn-action view" (click)="viewOrderDetail(order)" title="View Order Items">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                      <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                    View Items
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+  }
+
+  <!-- ORDER DETAIL VIEW - Order Items List -->
+  @if (currentView() === 'orderDetail' && selectedOrder()) {
+    <div class="order-info-card">
+      <div class="order-info-grid">
+        <div class="info-item">
+          <label>Patient</label>
+          <span>{{ selectedOrder()?.patientName || 'N/A' }}</span>
+        </div>
+        <div class="info-item">
+          <label>Order Date</label>
+          <span>{{ formatDate(selectedOrder()?.orderDate ?? null) }}</span>
+        </div>
+        <div class="info-item">
+          <label>Priority</label>
+          <span class="priority-badge" [ngClass]="getPriorityClass(selectedOrder()?.priority ?? 0)">
+            {{ getPriorityLabel(selectedOrder()?.priority ?? 0) }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="search-bar">
+      <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/>
+        <path d="M21 21l-4.35-4.35"/>
+      </svg>
+      <input 
+        type="text" 
+        [value]="searchOrderItemId()"
+        (input)="updateSearchOrderItemId($any($event.target).value)"
+        placeholder="Filter by Order Item ID or Test Name..."
+        class="search-input"
+      />
+    </div>
+
+    <div class="content">
+      @if (loading()) {
+        <div class="loading">
+          <div class="spinner"></div>
+          Loading order items...
+        </div>
+      }
+
+      @if (!loading() && filteredOrderItems().length === 0) {
+        <div class="empty-state">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5">
+            <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+          <p>No order items found for this order</p>
+        </div>
+      }
+
+      @if (!loading() && filteredOrderItems().length > 0) {
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Order Item ID</th>
+              <th>Test Code</th>
+              <th>Test Name</th>
+              <th>Department</th>
+              <th>Normal Range</th>
+              <th>Units</th>
+              <th>Result Status</th>
+              <th>Current Value</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of filteredOrderItems(); track item.orderItemId) {
+              <tr class="clickable-row" (click)="enterResult(item)">
+                <td class="order-item-id">#{{ item.orderItemId }}</td>
+                <td>{{ item.testCode || 'N/A' }}</td>
+                <td>{{ item.testName || 'N/A' }}</td>
+                <td>{{ item.department || 'N/A' }}</td>
+                <td>{{ getNormalRange(item) }}</td>
+                <td>{{ item.units || 'N/A' }}</td>
+                <td>
+                  <span class="result-status" [class.has-result]="item.hasResult" [class.no-result]="!item.hasResult">
+                    {{ item.hasResult ? 'Completed' : 'Pending' }}
+                  </span>
+                </td>
+                <td class="value-cell">
+                  @if (item.hasResult && item.existingResult) {
+                    <span class="result-value">{{ item.existingResult.value }}</span>
+                    <span class="flag-badge" [ngClass]="getFlagClass(item.existingResult.flag)">
+                      {{ item.existingResult.flag }}
+                    </span>
+                  }
+                  @if (!item.hasResult) {
+                    <span class="no-value">—</span>
+                  }
+                </td>
+                <td class="actions">
+                  <button class="btn-action enter" (click)="enterResult(item); $event.stopPropagation()" [title]="item.hasResult ? 'Edit Result' : 'Enter Result'">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M17 3a2.828 2.828 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>
+                    </svg>
+                    {{ item.hasResult ? 'Edit' : 'Enter Result' }}
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+  }
+
+  <!-- RESULT ENTRY VIEW -->
+  @if (currentView() === 'resultEntry' && selectedOrderItem()) {
+    <div class="form-container">
+      <!-- Test Info Summary in Form -->
+      <div class="form-test-info">
+        <div class="test-badge">
+          <span class="test-name">{{ selectedOrderItem()?.testName }}</span>
+          <span class="test-code-small">{{ selectedOrderItem()?.testCode }}</span>
+        </div>
+        <div class="normal-range-info">
+          <span>Normal Range: </span>
+          <strong>{{ getNormalRange(selectedOrderItem()!) }} {{ selectedOrderItem()?.units || '' }}</strong>
+        </div>
+      </div>
+
+      <form (ngSubmit)="submitResult()" class="result-form">
+        <div class="form-row">
+          <div class="form-group readonly-group">
+            <label for="testName">Test Name</label>
+            <input type="text" id="testName" [value]="selectedOrderItem()?.testName || ''" readonly class="readonly" />
+          </div>
+
+          <div class="form-group readonly-group">
+            <label for="units">Units</label>
+            <input type="text" id="unitsDisplay" [value]="selectedOrderItem()?.units || ''" readonly class="readonly" />
+          </div>
+        </div>
+
+        <div class="form-group value-group">
+          <label for="value">Result Value *</label>
+          <div class="value-input-wrapper">
+            <input 
+              type="text" 
+              id="value" 
+              [value]="formData().value"
+              (input)="updateFormField('value', $any($event.target).value)"
+              required 
+              placeholder="Enter test result value"
+              class="value-input"
+              autofocus
+            />
+            <span class="units-suffix">{{ selectedOrderItem()?.units }}</span>
+          </div>
+          <small class="help-text">Normal range: {{ getNormalRange(selectedOrderItem()!) }}</small>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="analyte">Analyte</label>
+            <input type="text" id="analyte" [value]="formData().analyte" readonly class="readonly" />
+          </div>
+
+          <div class="form-group">
+            <label for="source">Source</label>
+            <select id="source" [value]="formData().source" (change)="updateFormField('source', $any($event.target).value)">
+              <option value="Manual">Manual</option>
+              <option value="Instrument">Instrument</option>
+              <option value="External">External</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-cancel" (click)="backToOrderDetail()">Cancel</button>
+          <button type="submit" class="btn-submit" [disabled]="loading()">
+            {{ loading() ? 'Saving...' : (selectedOrderItem()?.hasResult ? 'Update Result' : 'Save Result') }}
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+</div>
