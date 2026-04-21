@@ -42,6 +42,26 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    path: 'admin/manage-tests',
+    loadComponent: () => import('./components/admin/manage-tests/manage-tests.component').then(m => m.ManageTestsComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'admin/manage-panels',
+    loadComponent: () => import('./components/admin/manage-panels/manage-panels.component').then(m => m.ManagePanelsComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'admin/view-roles',
+    loadComponent: () => import('./components/admin/view-roles/view-roles.component').then(m => m.ViewRolesComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'admin/view-results',
+    loadComponent: () => import('./components/admin/manage-results/manage-results.component').then(m => m.ManageResultsComponent),
+    canActivate: [authGuard]
+  },
+  {
     path: 'reception',
     loadComponent: () => import('./components/reception/reception.component').then(m => m.ReceptionComponent),
     canActivate: [authGuard]

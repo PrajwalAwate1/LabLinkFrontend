@@ -129,7 +129,7 @@ export class ManageUsersComponent implements OnInit {
       phone: user.phone || '',
       password: '',
       isActive: user.isActive,
-      roleIds: []
+      roleIds: [...(user.roleIds ?? [])]
     };
     this.formError = '';
     this.showModal = true;

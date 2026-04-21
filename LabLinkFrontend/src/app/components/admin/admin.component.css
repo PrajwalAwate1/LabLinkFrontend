@@ -130,6 +130,7 @@
 .card-icon.green  { background: #f0fdf4; color: #16a34a; }
 .card-icon.purple { background: #fdf4ff; color: #9333ea; }
 .card-icon.orange { background: #fff7e6; color: #d97706; }
+.card-icon.teal   { background: #f0fdfa; color: #0d9488; }
 
 /* ── Card body ── */
 .card-body h3 {
