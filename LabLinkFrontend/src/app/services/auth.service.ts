@@ -10,6 +10,7 @@ export interface LoginRequest {
 export interface LoginResponse {
   token: string;
   userId: number;
+  name: string;
   roles: string[];
 }
 
@@ -34,6 +35,7 @@ export class AuthService {
       tap((response) => {
         localStorage.setItem('token', response.token);
         localStorage.setItem('userId', response.userId.toString());
+        localStorage.setItem('userName', response.name);
         localStorage.setItem('roles', JSON.stringify(response.roles));
       })
     );
@@ -46,8 +48,10 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem('token');
     localStorage.removeItem('userId');
+    localStorage.removeItem('userName');
     localStorage.removeItem('roles');
     localStorage.removeItem('patientId');
+    localStorage.removeItem('userEmail');
   }
 
   isLoggedIn(): boolean {

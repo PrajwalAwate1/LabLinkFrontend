@@ -23,35 +23,120 @@
 
   <main class="main">
     <div class="page-title">
-      <h2>Phlebotomist Dashboard</h2>
-      <p>Manage your daily patient appointments</p>
+      <h2>Specimen Collection Dashboard</h2>
+      <p>Today's Lab Orders - Manage specimen collection for each order</p>
     </div>
 
-    <div class="cards-grid">
+    <div class="filter-section">
+      <label for="orderDate" class="form-label">Filter by Date:</label>
+      <input 
+        type="date" 
+        id="orderDate" 
+        class="form-control date-input"
+        [(ngModel)]="selectedDate" 
+        (change)="onDateChange()">
+    </div>
 
-      <!-- Manage Appointments -->
-      <div class="card">
-        <div class="card-icon blue">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="4" width="18" height="18" rx="2"/>
-            <line x1="16" y1="2" x2="16" y2="6"/>
-            <line x1="8" y1="2" x2="8" y2="6"/>
-            <line x1="3" y1="10" x2="21" y2="10"/>
-            <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/>
-          </svg>
+    <div *ngIf="loading" class="text-center my-4">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
+      {{ errorMessage }}
+    </div>
+
+    <div *ngIf="!loading && orders.length > 0" class="orders-container">
+        <div *ngFor="let order of orders" class="order-card mb-3">
+        <div class="order-header" (click)="toggleOrderItems(order)">
+          <div class="order-info">
+            <h5 class="mb-1">Order #{{ order.orderId }}</h5>
+            <small class="text-muted">
+              Patient: {{ order.patientName || 'ID: ' + order.patientId }} | 
+              Date: {{ order.orderDate | date: 'short' }} |
+              Priority: {{ order.priority }}
+            </small>
+          </div>
+          <button class="btn btn-sm btn-outline-primary toggle-btn">
+            <span *ngIf="!order.showItems">▼ Show Items</span>
+            <span *ngIf="order.showItems">▲ Hide Items</span>
+          </button>
         </div>
-        <div class="card-body">
-          <h3>Manage Appointments</h3>
-          <p>View and manage your scheduled patient appointments</p>
+
+        <div *ngIf="order.showItems" class="order-items-container">
+          <div *ngIf="order.items.length === 0" class="text-center text-muted py-3">
+            Loading order items...
+          </div>
+
+          <div *ngFor="let item of order.items" class="order-item-card">
+            <div class="item-info">
+              <strong>Order Item #{{ item.orderItemId }}</strong>
+              <div class="text-muted small">
+                <span *ngIf="item.testId">Test: {{ item.testName || 'ID: ' + item.testId }}</span>
+                <span *ngIf="item.panelId">Panel ID: {{ item.panelId }}</span>
+                <span *ngIf="item.department"> | Department: {{ item.department }}</span>
+              </div>
+            </div>
+
+            <div class="specimen-status-section">
+              <div class="form-check">
+                <input 
+                  class="form-check-input" 
+                  type="checkbox" 
+                  [(ngModel)]="item.isCollected"
+                  (change)="onCollectionStatusChange(order, item)"
+                  [disabled]="item.specimens.length > 0"
+                  id="collected-{{ item.orderItemId }}">
+                <label class="form-check-label" [attr.for]="'collected-' + item.orderItemId">
+                  Specimen Collected
+                </label>
+              </div>
+
+              <div *ngIf="!item.isCollected" class="rejection-reason-section">
+                <label [attr.for]="'reason-' + item.orderItemId" class="form-label">
+                  Reason for Not Collecting <span class="text-danger">*</span>
+                </label>
+                <textarea 
+                  class="form-control" 
+                  [(ngModel)]="item.rejectionReason"
+                  [disabled]="item.specimens.length > 0"
+                  [id]="'reason-' + item.orderItemId"
+                  rows="2"
+                  placeholder="Enter reason (e.g., patient refused, insufficient sample, etc.)"></textarea>
+              </div>
+
+              <div *ngIf="item.specimens.length > 0" class="existing-specimen-info">
+                <div class="alert alert-info mb-2">
+                  <strong>Status:</strong> 
+                  <span *ngIf="item.specimens[0].rejectionReason; else collected">
+                    Not Collected - Reason: {{ item.specimens[0].rejectionReason }}
+                  </span>
+                  <ng-template #collected>
+                    <span *ngIf="item.specimens[0].collectedDate">
+                      Collected on {{ item.specimens[0].collectedDate | date: 'short' }}
+                    </span>
+                  </ng-template>
+                  <br>
+                  <small>Processed By: {{ getUserName(item.specimens[0].collectedBy) }}</small>
+                </div>
+              </div>
+
+              <button 
+                *ngIf="item.specimens.length === 0"
+                class="btn btn-primary btn-sm mt-2"
+                (click)="saveSpecimenStatus(order, item)">
+                Save Specimen Status
+              </button>
+            </div>
+          </div>
         </div>
-        <div class="card-footer">
-          <span class="coming-soon">Coming Soon</span>
-          <span class="arrow">→</span>
         </div>
       </div>
 
-    </div>
-  </main>
+      <div *ngIf="!loading && orders.length === 0" class="alert alert-info" role="alert">
+        No lab orders found for the selected date.
+      </div>
 
+  </main>
 </div>
