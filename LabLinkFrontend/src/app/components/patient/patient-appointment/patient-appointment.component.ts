@@ -25,6 +25,7 @@ export class PatientAppointmentComponent implements OnInit {
   filterDate = '';
   successMessage = '';
   errorMessage = '';
+  minDateTime = new Date().toISOString().substring(0, 16);
 
   appointmentForm!: FormGroup;
   editingId: number | null = null;

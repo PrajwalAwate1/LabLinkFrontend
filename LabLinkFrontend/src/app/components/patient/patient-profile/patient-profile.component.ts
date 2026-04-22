@@ -22,6 +22,7 @@ export class PatientProfileComponent implements OnInit {
   isSaving = false;
   successMessage = '';
   errorMessage = '';
+  today = new Date().toISOString().substring(0, 10);
 
   constructor(
     private fb: FormBuilder,
@@ -40,7 +41,7 @@ export class PatientProfileComponent implements OnInit {
       name: ['', [Validators.required, Validators.minLength(2)]],
       dob: ['', Validators.required],
       gender: ['', Validators.required],
-      contactInfo: ['', Validators.required],
+      contactInfo: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
       address: [''],
       primaryPhysicianName: ['']
     });

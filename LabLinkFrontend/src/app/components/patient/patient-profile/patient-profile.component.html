@@ -101,6 +101,7 @@
               class="form-control"
               [class.is-invalid]="f['dob'].invalid && f['dob'].touched"
               formControlName="dob"
+              [max]="today"
             />
             <div class="invalid-feedback" *ngIf="f['dob'].errors?.['required'] && f['dob'].touched">
               Date of birth is required.
@@ -138,10 +139,14 @@
               class="form-control"
               [class.is-invalid]="f['contactInfo'].invalid && f['contactInfo'].touched"
               formControlName="contactInfo"
-              placeholder="e.g. 0412 345 678"
+              placeholder="10-digit phone number"
+              maxlength="10"
             />
             <div class="invalid-feedback" *ngIf="f['contactInfo'].errors?.['required'] && f['contactInfo'].touched">
               Phone number is required.
+            </div>
+            <div class="invalid-feedback" *ngIf="f['contactInfo'].errors?.['pattern'] && f['contactInfo'].touched">
+              Phone number must be exactly 10 digits (numbers only).
             </div>
           </div>
 

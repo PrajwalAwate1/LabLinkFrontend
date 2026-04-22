@@ -42,6 +42,7 @@ export class RegisterPatientComponent implements OnInit {
   // Patient user account fields (new patients only)
   formEmail = '';
   formPassword = '';
+  today = new Date().toISOString().substring(0, 10);
 
   // Delete confirm
   showDeleteConfirm = false;
@@ -138,12 +139,22 @@ export class RegisterPatientComponent implements OnInit {
       return;
     }
     if (!this.formContactInfo.trim()) {
-      this.formError = 'Contact info is required.';
+      this.formError = 'Phone number is required.';
+      return;
+    }
+    const phoneRegex = /^\d{10}$/;
+    if (!phoneRegex.test(this.formContactInfo.trim())) {
+      this.formError = 'Phone number must be exactly 10 digits (numbers only).';
       return;
     }
     if (!this.isEditing) {
       if (!this.formEmail.trim()) {
         this.formError = 'Email is required to create a patient account.';
+        return;
+      }
+      const emailRegex = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+      if (!emailRegex.test(this.formEmail.trim())) {
+        this.formError = 'Please enter a valid email address.';
         return;
       }
       if (!this.formPassword || this.formPassword.length < 8) {

@@ -112,6 +112,17 @@
   font-size: 13px;
 }
 
+.field-error {
+  color: #cf1322;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.input-error {
+  border-color: #cf1322 !important;
+  box-shadow: 0 0 0 2px rgba(207, 19, 34, 0.1) !important;
+}
+
 .success-message {
   display: flex;
   align-items: center;

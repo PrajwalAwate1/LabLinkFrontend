@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -21,29 +21,57 @@ export class SignupComponent {
   errorMessage = '';
   successMessage = '';
   isLoading = false;
+  submitted = false;
+
+  get nameError(): string {
+    if (!this.submitted) return '';
+    if (!this.name.trim()) return 'Full name is required.';
+    if (this.name.trim().length < 2) return 'Name must be at least 2 characters.';
+    return '';
+  }
+
+  get emailError(): string {
+    if (!this.submitted) return '';
+    if (!this.email.trim()) return 'Email is required.';
+    const emailRegex = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(this.email.trim())) return 'Please enter a valid email address.';
+    return '';
+  }
+
+  get phoneError(): string {
+    if (!this.submitted) return '';
+    if (!this.phone.trim()) return 'Phone number is required.';
+    if (!/^\d{10}$/.test(this.phone.trim())) return 'Phone must be exactly 10 digits (numbers only).';
+    return '';
+  }
+
+  get passwordError(): string {
+    if (!this.submitted) return '';
+    if (!this.password) return 'Password is required.';
+    if (this.password.length < 8 || this.password.length > 20) return 'Password must be between 8 and 20 characters.';
+    return '';
+  }
+
+  get confirmPasswordError(): string {
+    if (!this.submitted) return '';
+    if (!this.confirmPassword) return 'Please confirm your password.';
+    if (this.password !== this.confirmPassword) return 'Passwords do not match.';
+    return '';
+  }
 
   constructor(
     private authService: AuthService,
     private patientService: PatientService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   onSubmit(): void {
     this.errorMessage = '';
     this.successMessage = '';
+    this.submitted = true;
 
-    if (!this.name || !this.email || !this.phone || !this.password || !this.confirmPassword) {
-      this.errorMessage = 'Please fill in all fields.';
-      return;
-    }
-
-    if (this.password !== this.confirmPassword) {
-      this.errorMessage = 'Passwords do not match.';
-      return;
-    }
-
-    if (this.password.length < 8 || this.password.length > 20) {
-      this.errorMessage = 'Password must be between 8 and 20 characters.';
+    if (this.nameError || this.emailError || this.phoneError || this.passwordError || this.confirmPasswordError) {
       return;
     }
 
@@ -79,6 +107,7 @@ export class SignupComponent {
                 this.authService.logout();
                 this.isLoading = false;
                 this.successMessage = 'Account created successfully! Redirecting to login...';
+                this.cdr.markForCheck();
                 setTimeout(() => this.router.navigate(['/login']), 1800);
               },
               error: () => {
@@ -94,12 +123,14 @@ export class SignupComponent {
                     this.authService.logout();
                     this.isLoading = false;
                     this.successMessage = 'Account created successfully! Redirecting to login...';
+                    this.cdr.markForCheck();
                     setTimeout(() => this.router.navigate(['/login']), 1800);
                   },
                   error: () => {
                     this.authService.logout();
                     this.isLoading = false;
                     this.successMessage = 'Account created successfully! Redirecting to login...';
+                    this.cdr.markForCheck();
                     setTimeout(() => this.router.navigate(['/login']), 1800);
                   }
                 });
@@ -109,6 +140,7 @@ export class SignupComponent {
           error: () => {
             this.isLoading = false;
             this.successMessage = 'Account created successfully! Redirecting to login...';
+            this.cdr.markForCheck();
             setTimeout(() => this.router.navigate(['/login']), 1800);
           }
         });
@@ -122,6 +154,7 @@ export class SignupComponent {
         } else {
           this.errorMessage = 'Registration failed. Please try again.';
         }
+        this.cdr.markForCheck();
       }
     });
   }

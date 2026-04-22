@@ -168,6 +168,7 @@
               Date & Time <span class="text-danger">*</span>
             </label>
             <input type="datetime-local" class="form-control" formControlName="bookedDateTime"
+              [min]="minDateTime"
               [class.is-invalid]="f['bookedDateTime'].invalid && f['bookedDateTime'].touched">
             <div class="invalid-feedback">Please select a date and time.</div>
           </div>
