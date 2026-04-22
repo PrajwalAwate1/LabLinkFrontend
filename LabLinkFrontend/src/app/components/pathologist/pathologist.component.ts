@@ -61,6 +61,7 @@ export class PathologistComponent implements OnInit {
   isLoading = false;
   errorMessage = '';
   successMessage = '';
+  userName = '';
   
   // Review form
   showReviewModal = false;
@@ -75,6 +76,7 @@ export class PathologistComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.userName = localStorage.getItem('userName') || 'Pathologist';
     this.loadOrders();
   }
 

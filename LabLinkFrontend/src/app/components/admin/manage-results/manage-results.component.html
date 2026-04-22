@@ -12,123 +12,216 @@
     </div>
     <div class="header-right">
       <span class="admin-badge">Admin</span>
-      <button class="btn-back" (click)="goBack()">
+      <button class="btn-back" (click)="selectedOrder ? backToList() : goBack()">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M19 12H5M12 5l-7 7 7 7"/>
         </svg>
-        Dashboard
+        {{ selectedOrder ? 'All Results' : 'Dashboard' }}
       </button>
     </div>
   </header>
 
-  <!-- Main Content -->
   <main class="main">
 
-    <div class="page-title-row">
-      <div>
-        <h2>View Results</h2>
-        <p>Search and view lab result entries by order item</p>
-      </div>
+    <!-- Global loading (initial page load) -->
+    <div class="loading-state" *ngIf="loading && !selectedOrder && !detailLoading">
+      <div class="spinner"></div>
+      <span>Loading all lab results…</span>
     </div>
 
-    <!-- Search Bar -->
-    <div class="search-bar">
-      <div class="search-field">
-        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-        </svg>
-        <input type="number" placeholder="Search by Order Item ID..." [(ngModel)]="searchOrderItemId"
-               (keyup.enter)="search()" class="search-input" min="1"/>
-      </div>
-      <button class="btn-search" (click)="search()">Search</button>
-      <button class="btn-clear" (click)="clearSearch()">Clear</button>
-    </div>
-
-    <!-- Error Banner -->
-    <div class="error-banner" *ngIf="error">
+    <!-- Global error (shown outside both views) -->
+    <div class="error-banner" *ngIf="error && !selectedOrder && !detailLoading">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
         <line x1="12" y1="16" x2="12.01" y2="16"/>
       </svg>
       {{ error }}
+      <button class="btn-retry" (click)="loadAllOrders()">Retry</button>
     </div>
 
-    <!-- Loading -->
-    <div class="loading-state" *ngIf="loading">
-      <div class="spinner"></div>
-      <span>Loading results...</span>
-    </div>
+    <!-- ── LIST VIEW ── -->
+    <ng-container *ngIf="!selectedOrder && !detailLoading && !loading">
+      <div class="page-title-row">
+        <div>
+          <h2>All Lab Results</h2>
+          <p>View result reports for all patients across all lab orders</p>
+        </div>
+        <button class="btn-refresh" (click)="loadAllOrders()" [disabled]="loading">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 4 23 10 17 10"/>
+            <path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/>
+          </svg>
+          Refresh
+        </button>
+      </div>
 
-    <!-- Prompt State -->
-    <div class="empty-state" *ngIf="!loading && !error && results.length === 0 && !searchOrderItemId">
-      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c0cdd8"
-           stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
-        <polyline points="14 2 14 8 20 8"/>
-        <line x1="16" y1="13" x2="8" y2="13"/>
-        <line x1="16" y1="17" x2="8" y2="17"/>
-        <polyline points="10 9 9 9 8 9"/>
-      </svg>
-      <p>Enter an Order Item ID to search for results.</p>
-    </div>
+      <!-- Search -->
+      <div class="search-bar">
+        <div class="search-field">
+          <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="text" placeholder="Search by patient name or order ID…"
+                 [(ngModel)]="searchTerm" (input)="applyFilter()" class="search-input"/>
+        </div>
+        <button class="btn-clear" (click)="searchTerm = ''; applyFilter()">Clear</button>
+      </div>
 
-    <!-- Empty State after search -->
-    <div class="empty-state" *ngIf="!loading && !error && results.length === 0 && searchOrderItemId">
-      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c0cdd8"
-           stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
-        <polyline points="14 2 14 8 20 8"/>
-      </svg>
-      <p>No results found for Order Item ID {{ searchOrderItemId }}.</p>
-    </div>
+      <!-- Error -->
 
-    <!-- Results Table -->
-    <div class="table-wrapper" *ngIf="!loading && results.length > 0">
-      <table class="results-table">
-        <thead>
-          <tr>
-            <th>Result ID</th>
-            <th>Order Item ID</th>
-            <th>Test ID</th>
-            <th>Analyte</th>
-            <th>Value</th>
-            <th>Units</th>
-            <th>Source</th>
-            <th>Flag</th>
-            <th>Entered By</th>
-            <th>Entered Date</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let result of results">
-            <td><span class="result-id">#{{ result.resultId }}</span></td>
-            <td class="text-muted">{{ result.orderItemId }}</td>
-            <td class="text-muted">{{ result.testId }}</td>
-            <td>{{ result.analyte || '—' }}</td>
-            <td><strong>{{ result.value || '—' }}</strong></td>
-            <td class="text-muted">{{ result.units || '—' }}</td>
-            <td class="text-muted">{{ result.source || '—' }}</td>
-            <td>
-              <span class="flag-badge"
-                [ngClass]="{
-                  'flag-normal': result.flag === 'Normal',
-                  'flag-abnormal': result.flag === 'Abnormal',
-                  'flag-panic': result.flag === 'Panic',
-                  'flag-unknown': !result.flag
-                }">
-                {{ result.flag || '—' }}
+      <!-- (Errors shown globally above) -->
+
+      <!-- Loading placeholder (search bar always visible) -->
+
+      <!-- Empty -->
+      <div class="empty-state" *ngIf="!loading && filteredOrders.length === 0 && !error">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c0cdd8"
+             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+        </svg>
+        <p>No lab orders found.</p>
+      </div>
+
+      <!-- Orders Table -->
+      <div class="table-wrapper" *ngIf="!loading && filteredOrders.length > 0">
+        <table class="results-table">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Patient Name</th>
+              <th>Order Date</th>
+              <th>Priority</th>
+              <th>Tests</th>
+              <th>Results Entered</th>
+              <th>Pending</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let order of filteredOrders">
+              <td><span class="result-id">#{{ order.orderId }}</span></td>
+              <td><strong>{{ order.patientName || '—' }}</strong></td>
+              <td class="text-muted">{{ order.orderDate ? (order.orderDate | date:'mediumDate') : '—' }}</td>
+              <td>
+                <span class="priority-badge" [ngClass]="order.priority === 1 ? 'priority-urgent' : 'priority-normal'">
+                  {{ order.priority === 1 ? 'Urgent' : 'Normal' }}
+                </span>
+              </td>
+              <td class="text-muted">{{ order.orderItemCount }}</td>
+              <td>
+                <span class="completed-count">{{ completedResults(order) }}</span>
+                <span class="text-muted"> / {{ order.orderItemCount }}</span>
+              </td>
+              <td>
+                <span *ngIf="order.pendingResultCount > 0" class="pending-badge">
+                  {{ order.pendingResultCount }} pending
+                </span>
+                <span *ngIf="order.pendingResultCount === 0" class="done-badge">Complete</span>
+              </td>
+              <td>
+                <button class="btn-view" (click)="viewOrder(order.orderId)">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                       stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                  View Results
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </ng-container>
+
+    <!-- ── DETAIL VIEW ── -->
+    <ng-container *ngIf="selectedOrder || detailLoading">
+      <div class="loading-state" *ngIf="detailLoading">
+        <div class="spinner"></div>
+        <span>Loading results…</span>
+      </div>
+
+      <ng-container *ngIf="selectedOrder && !detailLoading">
+        <div class="detail-header">
+          <div class="detail-title">
+            <h2>Order #{{ selectedOrder.orderId }} — Results</h2>
+            <p class="detail-subtitle">
+              <strong>Patient:</strong> {{ selectedOrder.patientName || '—' }} &nbsp;|&nbsp;
+              <strong>Date:</strong> {{ selectedOrder.orderDate ? (selectedOrder.orderDate | date:'mediumDate') : '—' }} &nbsp;|&nbsp;
+              <strong>Priority:</strong>
+              <span class="priority-badge" [ngClass]="selectedOrder.priority === 1 ? 'priority-urgent' : 'priority-normal'">
+                {{ selectedOrder.priority === 1 ? 'Urgent' : 'Normal' }}
               </span>
-            </td>
-            <td class="text-muted">{{ result.enteredByUsername || '—' }}</td>
-            <td class="text-muted">{{ result.enteredDate ? (result.enteredDate | date:'short') : '—' }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+            </p>
+          </div>
+        </div>
+
+        <!-- Error in detail -->
+        <div class="error-banner" *ngIf="error">{{ error }}</div>
+
+        <div class="table-wrapper">
+          <table class="results-table">
+            <thead>
+              <tr>
+                <th>Test Name</th>
+                <th>Test Code</th>
+                <th>Department</th>
+                <th>Analyte</th>
+                <th>Value</th>
+                <th>Units</th>
+                <th>Normal Range</th>
+                <th>Flag</th>
+                <th>Entered By</th>
+                <th>Entered Date</th>
+                <th>Source</th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngFor="let item of selectedOrder.orderItems">
+                <tr *ngIf="item.existingResult">
+                  <td><strong>{{ item.testName || '—' }}</strong></td>
+                  <td class="text-muted">{{ item.testCode || '—' }}</td>
+                  <td class="text-muted">{{ item.department || '—' }}</td>
+                  <td>{{ item.existingResult.analyte || '—' }}</td>
+                  <td><strong class="value-cell">{{ item.existingResult.value || '—' }}</strong></td>
+                  <td class="text-muted">{{ item.existingResult.units || item.units || '—' }}</td>
+                  <td class="text-muted">
+                    <span *ngIf="item.minNormalValue != null && item.maxNormalValue != null">
+                      {{ item.minNormalValue }} – {{ item.maxNormalValue }}
+                    </span>
+                    <span *ngIf="item.minNormalValue == null || item.maxNormalValue == null">—</span>
+                  </td>
+                  <td>
+                    <span class="flag-badge" [ngClass]="getFlagClass(item.existingResult.flag)">
+                      {{ item.existingResult.flag || '—' }}
+                    </span>
+                  </td>
+                  <td class="text-muted">{{ item.existingResult.enteredByUsername || '—' }}</td>
+                  <td class="text-muted">{{ item.existingResult.enteredDate ? (item.existingResult.enteredDate | date:'short') : '—' }}</td>
+                  <td class="text-muted">{{ item.existingResult.source || '—' }}</td>
+                </tr>
+                <tr *ngIf="!item.existingResult" class="no-result-row">
+                  <td><strong>{{ item.testName || '—' }}</strong></td>
+                  <td class="text-muted">{{ item.testCode || '—' }}</td>
+                  <td class="text-muted">{{ item.department || '—' }}</td>
+                  <td colspan="8" class="text-muted pending-cell">Result not yet entered</td>
+                </tr>
+              </ng-container>
+              <tr *ngIf="selectedOrder.orderItems.length === 0">
+                <td colspan="11" class="no-data">No test items found for this order.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </ng-container>
+    </ng-container>
 
   </main>
-
 </div>
+

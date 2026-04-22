@@ -63,7 +63,7 @@ export class PatientProfileComponent implements OnInit {
         const p: PatientResponseDto = res.data;
         this.profileForm.patchValue({
           name: p.name ?? '',
-          dob: p.dob ? p.dob.substring(0, 10) : '',
+          dob: (p.dob && !p.dob.startsWith('0001')) ? p.dob.substring(0, 10) : this.today,
           gender: this.genderMap[p.gender ?? ''] ?? p.gender ?? '',
           contactInfo: p.contactInfo ?? '',
           address: p.address ?? '',

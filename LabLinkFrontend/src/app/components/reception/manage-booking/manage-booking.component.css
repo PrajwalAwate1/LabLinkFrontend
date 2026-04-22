@@ -185,37 +185,37 @@
 .btn-icon.delete:hover { border-color: #cf1322; color: #cf1322; background: #fff1f0; }
 
 /* ── Modal ── */
-.modal-backdrop {
+.custom-overlay {
   position: fixed; inset: 0;
-  background: rgba(10, 25, 41, 0.35); z-index: 40;
+  background: rgba(10, 25, 41, 0.35); z-index: 9998;
 }
-.modal {
+.custom-dialog {
   position: fixed; top: 50%; left: 50%;
-  transform: translate(-50%, -50%); z-index: 50;
+  transform: translate(-50%, -50%); z-index: 9999;
   background: #fff; border-radius: 16px; width: 100%; max-width: 520px;
   box-shadow: 0 20px 60px rgba(0,0,0,.18); max-height: 90vh; display: flex; flex-direction: column;
 }
-.modal-lg { max-width: 700px; }
-.modal-sm { max-width: 400px; }
+.custom-dialog-lg { max-width: 700px; }
+.custom-dialog-sm { max-width: 400px; }
 
-.modal-header {
+.custom-dialog-header {
   display: flex; align-items: flex-start; justify-content: space-between;
   padding: 20px 24px 0; flex-shrink: 0;
 }
-.modal-header h3 { font-size: 18px; font-weight: 700; color: #0a1929; margin: 0 0 2px; }
+.custom-dialog-header h3 { font-size: 18px; font-weight: 700; color: #0a1929; margin: 0 0 2px; }
 .modal-subtitle { font-size: 13px; color: #637381; margin: 0; }
-.modal-close {
+.custom-dialog-close {
   background: transparent; border: none; color: #94a3b8; cursor: pointer;
   padding: 4px; border-radius: 6px; display: flex; align-items: center;
   justify-content: center; transition: color .2s, background .2s; flex-shrink: 0; margin-left: 8px;
 }
-.modal-close:hover { color: #0a1929; background: #f1f4f8; }
+.custom-dialog-close:hover { color: #0a1929; background: #f1f4f8; }
 
-.modal-body {
+.custom-dialog-body {
   padding: 20px 24px; display: flex; flex-direction: column; gap: 14px;
   overflow-y: auto;
 }
-.modal-footer {
+.custom-dialog-footer {
   display: flex; justify-content: flex-end; gap: 10px; padding: 0 24px 20px; flex-shrink: 0;
 }
 

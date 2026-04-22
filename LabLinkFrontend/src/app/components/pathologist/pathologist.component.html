@@ -2,8 +2,14 @@
   <!-- Header -->
   <header class="dashboard-header">
     <div class="header-content">
-      <h1>🔬 Pathologist Dashboard</h1>
-      <button class="logout-btn" (click)="logout()">Logout</button>
+      <div class="header-brand">
+        <span class="brand-name">LabLink</span>
+        <span class="role-badge">Pathologist</span>
+      </div>
+      <div class="header-right">
+        <span class="user-name">{{ userName }}</span>
+        <button class="logout-btn" (click)="logout()">Logout</button>
+      </div>
     </div>
   </header>
 
@@ -24,7 +30,7 @@
       <div class="section-header">
         <h2>Lab Orders for Review</h2>
         <button class="refresh-btn" (click)="loadOrders()" [disabled]="isLoading">
-          🔄 Refresh
+          Refresh
         </button>
       </div>
 
@@ -89,7 +95,7 @@
               </td>
               <td>
                 <button class="action-btn view-btn" (click)="viewOrderDetails(order.orderId)">
-                  👁️ Review
+                  Review
                 </button>
               </td>
             </tr>
@@ -194,7 +200,7 @@
       <!-- Review Action -->
       <div class="review-action">
         <button class="primary-btn" (click)="openReviewModal()">
-          {{ selectedOrder.existingReview ? '✏️ Update Review' : '✅ Submit Review' }}
+          {{ selectedOrder.existingReview ? 'Update Review' : 'Submit Review' }}
         </button>
       </div>
     </div>

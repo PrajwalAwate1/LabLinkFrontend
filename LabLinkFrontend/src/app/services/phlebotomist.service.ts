@@ -131,10 +131,13 @@ export class PhlebotomistService {
       `${this.apiUrl}/Test/${testId}`,
       { headers: this.getHeaders() }
     ).pipe(
-      map(response => ({
-        testId: response.data.testId,
-        testName: response.data.testName
-      }))
+      map(response => {
+        const d = response?.data ?? response;
+        return {
+          testId: d?.testId ?? testId,
+          testName: d?.testName ?? `Test #${testId}`
+        };
+      })
     );
   }
 
