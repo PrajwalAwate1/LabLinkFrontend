@@ -11,6 +11,8 @@ import {
   AppointmentItemDto,
   AppointmentItemResponse
 } from '../../../services/booking.service';
+import { LabOrderService } from '../../../services/lab-order.service';
+import { forkJoin } from 'rxjs';
 
 type SelectionType = 'test' | 'panel';
 
@@ -70,9 +72,15 @@ export class ManageBookingComponent implements OnInit {
   deleteItemId: number | null = null;
   deleteItemLoading = false;
 
+  // Lab Order
+  labOrderCreated = false;
+  labOrderLoading = false;
+  createdOrderId: number | null = null;
+
   constructor(
     private appointmentService: AppointmentService,
     private bookingService: BookingService,
+    private labOrderService: LabOrderService,
     private patientService: PatientService,
     private router: Router,
     private cdr: ChangeDetectorRef
@@ -147,6 +155,9 @@ export class ManageBookingComponent implements OnInit {
     this.resetAddForm();
     this.formError = '';
     this.existingItems = [];
+    this.labOrderCreated = false;
+    this.labOrderLoading = false;
+    this.createdOrderId = null;
     this.showBookingModal = true;
     this.loadExistingItems(appt.appointmentId);
   }
@@ -171,6 +182,8 @@ export class ManageBookingComponent implements OnInit {
     this.selectedAppointment = null;
     this.pendingItems = [];
     this.existingItems = [];
+    this.labOrderCreated = false;
+    this.createdOrderId = null;
   }
 
   resetAddForm(): void {
@@ -315,6 +328,126 @@ export class ManageBookingComponent implements OnInit {
       year: 'numeric', month: 'short', day: 'numeric',
       hour: '2-digit', minute: '2-digit'
     });
+  }
+
+  createLabOrder(): void {
+    if (!this.selectedAppointment) return;
+    if (this.existingItems.length === 0 && this.pendingItems.length === 0) {
+      this.formError = 'Please add at least one test or panel before creating a lab order.';
+      this.cdr.markForCheck();
+      return;
+    }
+
+    this.labOrderLoading = true;
+    this.formError = '';
+    this.cdr.markForCheck();
+
+    const appt = this.selectedAppointment;
+
+    // Step 1: Save any pending booking items first, then create lab order
+    const savePending = (): void => {
+      // Step 2: Create the lab order
+      const labOrderDto = {
+        patientId: appt.patientId,
+        priority: 1,
+        isActive: true
+      };
+
+      this.labOrderService.createLabOrder(labOrderDto).subscribe({
+        next: (res) => {
+          const orderId = res.data?.orderId ?? res.data?.OrderId;
+          this.createdOrderId = orderId;
+
+          // Step 3: Create order items for each existing booking item
+          // Reload existing items to get the full updated list
+          this.bookingService.getItemsByAppointment(appt.appointmentId).subscribe({
+            next: (itemsRes) => {
+              this.existingItems = itemsRes.data;
+              const allItems = this.existingItems;
+
+              if (allItems.length === 0) {
+                this.labOrderCreated = true;
+                this.labOrderLoading = false;
+                this.successMessage = 'Lab order created successfully!';
+                this.cdr.markForCheck();
+                setTimeout(() => { this.successMessage = ''; this.cdr.markForCheck(); }, 4000);
+                return;
+              }
+
+              const orderItemCalls = allItems.map(item => {
+                // Standalone test: panelId is null or 1 (hardcoded default) → send panelId null
+                // Panel: panelId > 1 → send testId null
+                const isStandaloneTest = item.testId && (item.panelId == null || item.panelId === 1);
+                const dto = {
+                  orderId: orderId,
+                  testId: isStandaloneTest ? item.testId : null,
+                  panelId: isStandaloneTest ? null : (item.panelId ?? null),
+                  department: '',
+                  isActive: true
+                };
+                return this.labOrderService.createOrderItem(dto);
+              });
+
+              forkJoin(orderItemCalls).subscribe({
+                next: () => {
+                  this.labOrderCreated = true;
+                  this.labOrderLoading = false;
+                  this.pendingItems = [];
+                  this.successMessage = 'Lab order created successfully with ' + allItems.length + ' item(s)!';
+                  this.cdr.markForCheck();
+                  setTimeout(() => { this.successMessage = ''; this.cdr.markForCheck(); }, 4000);
+                },
+                error: (err) => {
+                  this.labOrderLoading = false;
+                  this.formError = err?.error?.message || 'Failed to create order items.';
+                  this.cdr.markForCheck();
+                }
+              });
+            },
+            error: () => {
+              this.labOrderLoading = false;
+              this.formError = 'Failed to load booking items.';
+              this.cdr.markForCheck();
+            }
+          });
+        },
+        error: (err) => {
+          this.labOrderLoading = false;
+          this.formError = err?.error?.message || 'Failed to create lab order.';
+          this.cdr.markForCheck();
+        }
+      });
+    };
+
+    // If there are pending items, save them first
+    if (this.pendingItems.length > 0) {
+      const appointmentId = appt.appointmentId;
+      const calls = this.pendingItems.map(p => {
+        const dto: AppointmentItemDto = {
+          appointmentId,
+          testId: p.type === 'test' ? p.id : null,
+          panelId: p.type === 'panel' ? p.id : null,
+          priority: p.priority,
+          instructions: p.instructions || undefined,
+          isActive: true
+        };
+        return this.bookingService.createAppointmentItem(dto);
+      });
+
+      forkJoin(calls).subscribe({
+        next: () => {
+          this.pendingItems = [];
+          savePending();
+        },
+        error: (err) => {
+          this.labOrderLoading = false;
+          this.formError = err?.error?.message || 'Failed to save pending booking items.';
+          this.cdr.markForCheck();
+        }
+      });
+    } else {
+      savePending();
+    }
   }
 
   goBack(): void {

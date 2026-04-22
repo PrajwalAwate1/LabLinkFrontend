@@ -317,3 +317,18 @@
   border: 2px solid rgba(255,255,255,.4); border-top-color: #fff;
   border-radius: 50%; animation: spin .7s linear infinite; display: inline-block;
 }
+
+/* ── Lab Order Button ── */
+.btn-laborder {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 9px 20px; background: #7c3aed; color: #fff;
+  border: none; border-radius: 9px; font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: background .2s, transform .15s; white-space: nowrap;
+}
+.btn-laborder:hover { background: #6d28d9; transform: translateY(-1px); }
+.btn-laborder:disabled { background: #94a3b8; cursor: not-allowed; transform: none; }
+
+/* ── Disabled icon button ── */
+.btn-icon.btn-disabled {
+  opacity: 0.4; cursor: not-allowed; pointer-events: none;
+}

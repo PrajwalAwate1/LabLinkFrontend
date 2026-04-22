@@ -107,6 +107,7 @@ export class ManageAppointmentsComponent implements OnInit {
     };
     this.formError = '';
     this.showModal = true;
+    this.cdr.markForCheck();
   }
 
   openEditModal(appt: AppointmentDto): void {
@@ -127,10 +128,12 @@ export class ManageAppointmentsComponent implements OnInit {
     };
     this.formError = '';
     this.showModal = true;
+    this.cdr.markForCheck();
   }
 
   closeModal(): void {
     this.showModal = false;
+    this.cdr.markForCheck();
   }
 
   saveAppointment(): void {
@@ -171,11 +174,13 @@ export class ManageAppointmentsComponent implements OnInit {
   confirmDelete(appt: AppointmentDto): void {
     this.deleteId = appt.appointmentId;
     this.showDeleteConfirm = true;
+    this.cdr.markForCheck();
   }
 
   cancelDelete(): void {
     this.showDeleteConfirm = false;
     this.deleteId = null;
+    this.cdr.markForCheck();
   }
 
   deleteAppointment(): void {
