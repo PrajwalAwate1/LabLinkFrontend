@@ -47,7 +47,6 @@ export class LoginComponent {
     this.passwordError = '';
     this.generalError = '';
 
-    // Client-side validation
     if (!this.email.trim()) {
       this.emailError = 'Email is required.';
       this.cdr.markForCheck();
@@ -69,6 +68,8 @@ export class LoginComponent {
 
     this.authService.login({ email: this.email.trim(), password: this.password }).subscribe({
       next: (response) => {
+        localStorage.setItem('userName', response.name);
+        
         this.isLoading = false;
         this.cdr.markForCheck();
         if (response.roles.includes('Admin')) {
