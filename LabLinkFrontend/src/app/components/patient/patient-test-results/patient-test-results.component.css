@@ -1,0 +1,19 @@
+.order-header:hover {
+  background: #f8fafc;
+}
+
+.result-table th {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: #637381;
+}
+
+.result-table td {
+  font-size: 13px;
+}
+
+.flag-badge {
+  font-size: 11px;
+}

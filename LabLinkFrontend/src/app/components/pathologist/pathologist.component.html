@@ -1,0 +1,249 @@
+<div class="pathologist-container">
+  <!-- Header -->
+  <header class="dashboard-header">
+    <div class="header-content">
+      <div class="header-brand">
+        <span class="brand-name">LabLink</span>
+        <span class="role-badge">Pathologist</span>
+      </div>
+      <div class="header-right">
+        <button class="btn-back-header" (click)="goBack()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none">
+            <path d="M19 12H5M12 5l-7 7 7 7"/>
+          </svg>
+          Back
+        </button>
+        <button class="logout-btn" (click)="logout()">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="dashboard-main">
+    <!-- Messages -->
+    <div *ngIf="errorMessage" class="alert alert-error">
+      {{ errorMessage }}
+      <button class="alert-close" (click)="errorMessage = ''">&times;</button>
+    </div>
+    <div *ngIf="successMessage" class="alert alert-success">
+      {{ successMessage }}
+      <button class="alert-close" (click)="successMessage = ''">&times;</button>
+    </div>
+
+    <!-- Orders List View -->
+    <div *ngIf="!selectedOrder" class="orders-section">
+      <div class="section-header">
+        <h2>Lab Orders for Review</h2>
+        <button class="refresh-btn" (click)="loadOrders()" [disabled]="isLoading">
+          Refresh
+        </button>
+      </div>
+
+      <!-- Filters -->
+      <div class="filters-bar">
+        <div class="search-box">
+          <input 
+            type="text" 
+            placeholder="Search by patient name or order ID..." 
+            [(ngModel)]="searchTerm"
+            (input)="onSearchChange()"
+          />
+        </div>
+        <div class="filter-group">
+          <label>Status:</label>
+          <select [(ngModel)]="filterStatus" (change)="onFilterChange()">
+            <option value="all">All</option>
+            <option value="pending review">Pending Review</option>
+            <option value="reviewed">Reviewed</option>
+            <option value="in progress">In Progress</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Loading -->
+      <div *ngIf="isLoading" class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Loading orders...</p>
+      </div>
+
+      <!-- Orders Table -->
+      <div *ngIf="!isLoading" class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Patient Name</th>
+              <th>Order Date</th>
+              <th>Priority</th>
+              <th>Tests</th>
+              <th>Results</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let order of filteredOrders">
+              <td>{{ order.orderId }}</td>
+              <td>{{ order.patientName }}</td>
+              <td>{{ order.orderDate | date:'short' }}</td>
+              <td>
+                <span class="priority-badge" [ngClass]="getPriorityClass(order.priority)">
+                  {{ getPriorityText(order.priority) }}
+                </span>
+              </td>
+              <td>{{ order.totalTests }}</td>
+              <td>{{ order.completedResults }} / {{ order.totalTests }}</td>
+              <td>
+                <span class="status-badge" [ngClass]="getStatusClass(order.isReviewed)">
+                  {{ getStatusText(order) }}
+                </span>
+              </td>
+              <td>
+                <button class="action-btn view-btn" (click)="viewOrderDetails(order.orderId)">
+                  Review
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="filteredOrders.length === 0">
+              <td colspan="8" class="no-data">No orders found</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Order Detail View -->
+    <div *ngIf="selectedOrder" class="order-detail-section">
+      <div class="detail-header">
+        <button class="back-btn" (click)="backToList()">← Back to Orders</button>
+        <h2>Order #{{ selectedOrder.orderId }} Details</h2>
+      </div>
+
+      <!-- Patient Info -->
+      <div class="patient-info-card">
+        <h3>Patient Information</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <label>Name:</label>
+            <span>{{ selectedOrder.patientName }}</span>
+          </div>
+          <div class="info-item">
+            <label>DOB:</label>
+            <span>{{ selectedOrder.patientDob | date:'mediumDate' }}</span>
+          </div>
+          <div class="info-item">
+            <label>Gender:</label>
+            <span>{{ selectedOrder.patientGender }}</span>
+          </div>
+          <div class="info-item">
+            <label>Order Date:</label>
+            <span>{{ selectedOrder.orderDate | date:'medium' }}</span>
+          </div>
+          <div class="info-item">
+            <label>Priority:</label>
+            <span class="priority-badge" [ngClass]="getPriorityClass(selectedOrder.priority)">
+              {{ getPriorityText(selectedOrder.priority) }}
+            </span>
+          </div>
+          <div class="info-item">
+            <label>Status:</label>
+            <span class="status-badge" [ngClass]="getStatusClass(getDetailStatusText())">
+              {{ getDetailStatusText() }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Test Results -->
+      <div class="results-card">
+        <h3>Test Results</h3>
+        <table class="results-table">
+          <thead>
+            <tr>
+              <th>Test Code</th>
+              <th>Test Name</th>
+              <th>Department</th>
+              <th>Value</th>
+              <th>Units</th>
+              <th>Normal Range</th>
+              <th>Flag</th>
+              <th>Entered By</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let result of selectedOrder.testResults" [ngClass]="{'flagged-row': result.flag}">
+              <td>{{ result.testCode }}</td>
+              <td>{{ result.testName }}</td>
+              <td>{{ result.department }}</td>
+              <td class="value-cell">{{ result.value || '-' }}</td>
+              <td>{{ result.units || '-' }}</td>
+              <td>{{ getNormalRange(result) }}</td>
+              <td>
+                <span *ngIf="result.flag" class="flag-badge" [ngClass]="getFlagClass(result.flag)">
+                  {{ result.flag }}
+                </span>
+                <span *ngIf="!result.flag">-</span>
+              </td>
+              <td>{{ result.enteredBy || '-' }}</td>
+              <td>{{ result.enteredDate ? (result.enteredDate | date:'short') : '-' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Existing Review (if any) -->
+      <div *ngIf="selectedOrder.existingReview" class="existing-review-card">
+        <h3>Current Review</h3>
+        <div class="review-info">
+          <p><strong>Status:</strong> {{ selectedOrder.existingReview.status }}</p>
+          <p><strong>Notes:</strong> {{ selectedOrder.existingReview.notes || 'No notes' }}</p>
+          <p><strong>Reviewed Date:</strong> {{ selectedOrder.existingReview.reviewDate | date:'medium' }}</p>
+        </div>
+      </div>
+
+      <!-- Review Action -->
+      <div class="review-action">
+        <button class="primary-btn" (click)="openReviewModal()">
+          {{ selectedOrder.existingReview ? 'Update Review' : 'Submit Review' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Review Modal -->
+    <div *ngIf="showReviewModal" class="modal-overlay" (click)="closeReviewModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>{{ selectedOrder?.existingReview ? 'Update Review' : 'Submit Review' }}</h3>
+          <button class="modal-close" (click)="closeReviewModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Review Status:</label>
+            <select [(ngModel)]="reviewStatus">
+              <option value="Approved">Approved</option>
+              <option value="Rejected">Rejected</option>
+              <option value="Needs Retest">Needs Retest</option>
+              <option value="Pending">Pending Additional Info</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Notes / Comments:</label>
+            <textarea 
+              [(ngModel)]="reviewNotes" 
+              rows="5" 
+              placeholder="Enter your review notes, observations, or recommendations..."
+            ></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="cancel-btn" (click)="closeReviewModal()">Cancel</button>
+          <button class="submit-btn" (click)="submitReview()" [disabled]="isSubmitting">
+            {{ isSubmitting ? 'Submitting...' : 'Submit Review' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

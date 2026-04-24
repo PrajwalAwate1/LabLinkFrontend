@@ -1,0 +1,259 @@
+<div class="page">
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-brand">
+      <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
+        <rect width="40" height="40" rx="10" fill="#0066CC"/>
+        <path d="M12 20h6m0 0v-6m0 6v6m4-12h4a2 2 0 012 2v8a2 2 0 01-2 2h-4"
+              stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="brand-name">LabLink</span>
+    </div>
+    <div class="header-right">
+      <span class="reception-badge">Reception</span>
+      <button class="btn-back" (click)="goBack()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 12H5M12 5l-7 7 7 7"/>
+        </svg>
+        Dashboard
+      </button>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="main">
+
+    <div class="page-title-row">
+      <div>
+        <h2>Manage Bookings</h2>
+        <p>Select an appointment and click "Create Lab Order" to begin booking tests</p>
+      </div>
+    </div>
+
+    <!-- Date Filter -->
+    <div class="filter-bar">
+      <div class="filter-field">
+        <svg class="filter-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2"/>
+          <line x1="16" y1="2" x2="16" y2="6"/>
+          <line x1="8" y1="2" x2="8" y2="6"/>
+          <line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+        <input type="date" [(ngModel)]="filterDate" class="filter-input" placeholder="Filter by date"/>
+      </div>
+      <button class="btn-search" (click)="applyFilter()">Filter</button>
+      <button class="btn-clear" (click)="clearFilter()">Clear</button>
+    </div>
+
+    <!-- Success Banner -->
+    <div class="success-banner" *ngIf="successMessage">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+      {{ successMessage }}
+    </div>
+
+    <!-- Error Banner -->
+    <div class="error-banner" *ngIf="error">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      {{ error }}
+    </div>
+
+    <!-- Loading -->
+    <div class="loading-state" *ngIf="loading">
+      <div class="spinner"></div>
+      <span>Loading appointments...</span>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="!loading && appointments.length === 0 && !error">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c0cdd8"
+           stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 11l3 3L22 4"/>
+        <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+      </svg>
+      <p>No appointments found. Try a different date or create appointments first.</p>
+    </div>
+
+    <!-- Appointments Table -->
+    <div class="table-wrapper" *ngIf="!loading && appointments.length > 0">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Patient</th>
+            <th>Date &amp; Time</th>
+            <th>Address</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let appt of appointments">
+            <td class="id-cell">{{ appt.appointmentId }}</td>
+            <td>
+              <div class="patient-cell">
+                <div class="avatar">{{ getPatientName(appt.patientId).charAt(0).toUpperCase() }}</div>
+                <span>{{ getPatientName(appt.patientId) }}</span>
+              </div>
+            </td>
+            <td class="datetime-cell">{{ formatDateTime(appt.bookedDateTime) }}</td>
+            <td class="text-muted">{{ appt.address || '—' }}</td>
+            <td>
+              <span class="status-badge" [class.active]="appt.isActive" [class.inactive]="!appt.isActive">
+                {{ appt.isActive ? 'Active' : 'Inactive' }}
+              </span>
+            </td>
+            <td>
+              <button class="btn-laborder"
+                      (click)="$event.stopPropagation(); createLabOrderAndOpenModal(appt)"
+                      [disabled]="creatingLabOrderForId === appt.appointmentId"
+                      title="Create Lab Order">
+                <span class="btn-spinner" *ngIf="creatingLabOrderForId === appt.appointmentId"></span>
+                <svg *ngIf="creatingLabOrderForId !== appt.appointmentId"
+                     width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <line x1="12" y1="18" x2="12" y2="12"/>
+                  <line x1="9" y1="15" x2="15" y2="15"/>
+                </svg>
+                {{ creatingLabOrderForId === appt.appointmentId ? 'Creating…' : 'Create Lab Order' }}
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+</div>
+
+<!-- ── Booking Modal ── -->
+<div class="custom-overlay" *ngIf="showBookingModal" (click)="closeBookingModal()"></div>
+<div class="custom-dialog custom-dialog-lg" *ngIf="showBookingModal">
+
+  <div class="custom-dialog-header">
+    <div>
+      <h3>Add Tests / Panels</h3>
+      <p class="modal-subtitle">
+        Lab Order #{{ createdOrderId }} — Appointment #{{ selectedAppointment?.appointmentId }} —
+        {{ selectedAppointment ? getPatientName(selectedAppointment.patientId) : '' }}
+      </p>
+    </div>
+    <button class="custom-dialog-close" (click)="closeBookingModal()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="custom-dialog-body">
+
+    <!-- ── Add New Item ── -->
+    <div class="section-label">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      Add Test / Panel
+    </div>
+
+    <div class="error-banner" *ngIf="formError">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      {{ formError }}
+    </div>
+
+    <!-- Add Form Row -->
+    <div class="add-form-row">
+      <div class="form-group type-group">
+        <label>Type</label>
+        <div class="type-toggle">
+          <button class="type-btn" [class.active]="addType === 'test'" (click)="addType = 'test'; addId = null">Test</button>
+          <button class="type-btn" [class.active]="addType === 'panel'" (click)="addType = 'panel'; addId = null">Panel</button>
+        </div>
+      </div>
+
+      <div class="form-group select-group">
+        <label>{{ addType === 'test' ? 'Test' : 'Panel' }} <span class="required">*</span></label>
+        <select [(ngModel)]="addId" class="form-input">
+          <option [ngValue]="null" disabled>-- Select {{ addType }} --</option>
+          <option *ngFor="let opt of (addType === 'test' ? testOptions : panelOptions)" [ngValue]="opt.value">{{ opt.label }}</option>
+        </select>
+      </div>
+
+      <div class="form-group priority-group">
+        <label>Priority</label>
+        <div class="type-toggle">
+          <button class="type-btn" [class.active]="addPriority === 0" (click)="addPriority = 0">Normal</button>
+          <button class="type-btn urgent" [class.active]="addPriority === 1" (click)="addPriority = 1">Urgent</button>
+        </div>
+      </div>
+
+      <div class="form-group instructions-group">
+        <label>Instructions</label>
+        <input type="text" [(ngModel)]="addInstructions" placeholder="Optional notes…" class="form-input"/>
+      </div>
+
+      <button class="btn-add" (click)="addToPending()" title="Add to list">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Add
+      </button>
+    </div>
+
+    <!-- ── Pending Items ── -->
+    <div *ngIf="pendingItems.length > 0">
+      <div class="section-label" style="margin-top: 8px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+        </svg>
+        Pending Items ({{ pendingItems.length }})
+      </div>
+      <div class="pending-list">
+        <div class="pending-item" *ngFor="let p of pendingItems; let i = index">
+          <span class="type-badge" [class.test-badge]="p.type === 'test'" [class.panel-badge]="p.type === 'panel'">
+            {{ p.type === 'test' ? 'Test' : 'Panel' }}
+          </span>
+          <span class="pending-name">{{ p.label }}</span>
+          <span class="pending-priority" [class.urgent-text]="p.priority === 1">
+            {{ p.priority === 0 ? 'Normal' : 'Urgent' }}
+          </span>
+          <span class="pending-instructions text-muted">{{ p.instructions || '—' }}</span>
+          <button class="btn-icon delete" (click)="removePending(i)" title="Remove">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="custom-dialog-footer">
+    <button class="btn-ghost" (click)="closeBookingModal()">Cancel</button>
+    <button class="btn-primary" (click)="saveAll()"
+            [disabled]="formLoading || pendingItems.length === 0">
+      <span class="btn-spinner" *ngIf="formLoading"></span>
+      {{ formLoading ? 'Saving…' : 'Save (' + pendingItems.length + ')' }}
+    </button>
+  </div>
+</div>

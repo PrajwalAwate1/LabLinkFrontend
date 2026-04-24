@@ -1,0 +1,389 @@
+.dashboard {
+  min-height: 100vh;
+  background: #f4f7fb;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  background: white;
+  border-bottom: 1px solid #e0e5ec;
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.brand-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0066cc;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.phlebotomist-badge {
+  background: #e3f2fd;
+  color: #1976d2;
+  padding: 0.4rem 0.9rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.btn-logout {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-logout:hover {
+  background: #c82333;
+}
+
+.main {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.page-title h2 {
+  font-size: 2rem;
+  color: #1a1a1a;
+  margin-bottom: 0.5rem;
+}
+
+.page-title p {
+  color: #6c757d;
+  font-size: 1rem;
+}
+
+.filter-section {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  margin: 2rem 0;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.date-input {
+  max-width: 250px;
+  padding: 0.5rem;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+}
+
+.orders-container {
+  margin-top: 2rem;
+}
+
+.order-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  overflow: hidden;
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  cursor: pointer;
+  border-bottom: 2px solid #e9ecef;
+  transition: background 0.2s;
+}
+
+.order-header:hover {
+  background: #e9ecef;
+}
+
+.order-info h5 {
+  font-weight: 600;
+  color: #0066cc;
+  margin: 0;
+}
+
+.toggle-btn {
+  border: 1px solid #0066cc;
+  color: #0066cc;
+  background: white;
+  padding: 0.4rem 1rem;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.toggle-btn:hover {
+  background: #0066cc;
+  color: white;
+}
+
+.order-items-container {
+  padding: 1rem;
+  background: #fafbfc;
+}
+
+.order-item-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  margin-bottom: 1rem;
+}
+
+.item-info strong {
+  color: #495057;
+  font-size: 1rem;
+}
+
+.item-info .text-muted {
+  margin-top: 0.5rem;
+}
+
+.specimen-status-section {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e9ecef;
+}
+
+.form-check {
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.form-check-input {
+  width: 1.25rem;
+  height: 1.25rem;
+  cursor: pointer;
+}
+
+.form-check-label {
+  font-weight: 600;
+  color: #495057;
+  margin-left: 0.5rem;
+  cursor: pointer;
+}
+
+.rejection-reason-section {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #fff3cd;
+  border-radius: 6px;
+}
+
+.rejection-reason-section .form-label {
+  font-weight: 600;
+  color: #856404;
+  margin-bottom: 0.5rem;
+}
+
+.rejection-reason-section textarea {
+  border: 1px solid #ffc107;
+}
+
+.existing-specimen-info {
+  margin-top: 1rem;
+}
+
+.existing-specimen-info .alert {
+  margin-bottom: 0;
+}
+
+@media (max-width: 768px) {
+  .main {
+    padding: 1rem;
+  }
+
+  .order-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .filter-section {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .date-input {
+    max-width: 100%;
+    width: 100%;
+  }
+
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0a1929;
+  letter-spacing: -0.3px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.phlebotomist-badge {
+  padding: 5px 14px;
+  background: #fdf2f8;
+  border: 1px solid #f0abda;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #be185d;
+}
+
+.btn-logout {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  background: transparent;
+  border: 1.5px solid #dde3ec;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #637381;
+  cursor: pointer;
+  transition: border-color .2s, color .2s, background .2s;
+}
+
+.btn-logout:hover {
+  border-color: #cf1322;
+  color: #cf1322;
+  background: #fff1f0;
+}
+
+.main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 48px 24px;
+}
+
+.page-title {
+  margin-bottom: 36px;
+}
+
+.page-title h2 {
+  font-size: 26px;
+  font-weight: 700;
+  color: #0a1929;
+  margin: 0 0 6px;
+}
+
+.page-title p {
+  font-size: 15px;
+  color: #637381;
+  margin: 0;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: 360px;
+}
+
+.card {
+  background: #fff;
+  border-radius: 14px;
+  border: 1px solid #edf0f5;
+  box-shadow: 0 1px 4px rgba(0,0,0,.06);
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  transition: box-shadow .2s, transform .2s;
+  cursor: pointer;
+}
+
+.card:hover {
+  box-shadow: 0 6px 20px rgba(0,0,0,.1);
+  transform: translateY(-3px);
+}
+
+.card-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-icon.blue { background: #e8f4fd; color: #0066cc; }
+
+.card-body h3 {
+  font-size: 17px;
+  font-weight: 700;
+  color: #0a1929;
+  margin: 0 0 6px;
+}
+
+.card-body p {
+  font-size: 13.5px;
+  color: #637381;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 14px;
+  border-top: 1px solid #f0f3f7;
+}
+
+.coming-soon {
+  font-size: 12px;
+  font-weight: 600;
+  color: #94a3b8;
+  background: #f1f5f9;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+.arrow {
+  font-size: 18px;
+  color: #c0cdd8;
+  transition: color .2s;
+}
+
+.card:hover .arrow {
+  color: #0066cc;
+}
+
+@media (max-width: 640px) {
+  .header { padding: 12px 16px; }
+  .main   { padding: 28px 16px; }
+  .cards-grid { grid-template-columns: 1fr; }
+}
