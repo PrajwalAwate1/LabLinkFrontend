@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+﻿import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface ResultEntry {
@@ -59,39 +59,29 @@ export interface LabOrderDetail {
   orderItems: OrderItemWithTest[];
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class ResultEntryService {
   private readonly apiUrl = 'http://localhost:5290/api/results';
 
   constructor(private http: HttpClient) {}
 
-  private getHeaders(): HttpHeaders {
-    const token = localStorage.getItem('token');
-    return new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    });
-  }
-
   getAllOrders(): Observable<{ data: LabOrderList[] }> {
-    return this.http.get<{ data: LabOrderList[] }>(`${this.apiUrl}/orders`, { headers: this.getHeaders() });
+    return this.http.get<{ data: LabOrderList[] }>(`${this.apiUrl}/orders`);
   }
 
   getOrderDetail(orderId: number): Observable<{ data: LabOrderDetail }> {
-    return this.http.get<{ data: LabOrderDetail }>(`${this.apiUrl}/orders/${orderId}`, { headers: this.getHeaders() });
+    return this.http.get<{ data: LabOrderDetail }>(`${this.apiUrl}/orders/${orderId}`);
   }
 
   getByOrderItemId(orderItemId: number): Observable<{ data: ResultEntry[] }> {
-    return this.http.get<{ data: ResultEntry[] }>(`${this.apiUrl}/order/${orderItemId}`, { headers: this.getHeaders() });
+    return this.http.get<{ data: ResultEntry[] }>(`${this.apiUrl}/order/${orderItemId}`);
   }
 
   create(entry: ResultEntryCreateRequest): Observable<{ message: string; data: ResultEntry }> {
-    return this.http.post<{ message: string; data: ResultEntry }>(this.apiUrl, entry, { headers: this.getHeaders() });
+    return this.http.post<{ message: string; data: ResultEntry }>(this.apiUrl, entry);
   }
 
   update(id: number, entry: ResultEntryCreateRequest): Observable<{ message: string; data: ResultEntry }> {
-    return this.http.put<{ message: string; data: ResultEntry }>(`${this.apiUrl}/${id}`, entry, { headers: this.getHeaders() });
+    return this.http.put<{ message: string; data: ResultEntry }>(`${this.apiUrl}/${id}`, entry);
   }
 }

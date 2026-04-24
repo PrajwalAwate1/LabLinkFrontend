@@ -55,7 +55,24 @@ export class AuthService {
   }
 
   isLoggedIn(): boolean {
-    return !!localStorage.getItem('token');
+    const token = localStorage.getItem('token');
+    if (!token) return false;
+    // Check JWT expiry from payload
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      if (payload.exp && Date.now() / 1000 > payload.exp) {
+        this.logout(); // clear stale token
+        return false;
+      }
+    } catch {
+      return false;
+    }
+    return true;
+  }
+
+  hasRole(...roles: string[]): boolean {
+    const userRoles = this.getRoles();
+    return roles.some(r => userRoles.includes(r));
   }
 
   getToken(): string | null {

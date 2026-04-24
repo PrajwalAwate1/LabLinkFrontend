@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+﻿import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
@@ -45,20 +45,15 @@ export class LabOrderService {
 
   constructor(private http: HttpClient) {}
 
-  private get headers() {
-    const token = localStorage.getItem('token');
-    return { Authorization: `Bearer ${token}` };
-  }
-
   createLabOrder(dto: LabOrderDto): Observable<{ message: string; data: any }> {
     return this.http.post<{ message: string; data: any }>(
-      `${this.baseUrl}/laborders/create`, dto, { headers: this.headers }
+      `${this.baseUrl}/laborders/create`, dto
     );
   }
 
   createOrderItem(dto: OrderItemDto): Observable<{ message: string; data: any }> {
     return this.http.post<{ message: string; data: any }>(
-      `${this.baseUrl}/orderitems/create`, dto, { headers: this.headers }
+      `${this.baseUrl}/orderitems/create`, dto
     );
   }
 }

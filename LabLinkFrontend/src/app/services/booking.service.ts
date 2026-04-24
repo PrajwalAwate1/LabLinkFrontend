@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+﻿import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
@@ -43,31 +43,26 @@ export class BookingService {
 
   constructor(private http: HttpClient) {}
 
-  private get headers() {
-    const token = localStorage.getItem('token');
-    return { Authorization: `Bearer ${token}` };
-  }
-
   getTests(): Observable<TestItem[]> {
-    return this.http.get<TestItem[]>(`${this.baseUrl}/test`, { headers: this.headers });
+    return this.http.get<TestItem[]>(`${this.baseUrl}/test`);
   }
 
   getPanels(): Observable<PanelItem[]> {
-    return this.http.get<PanelItem[]>(`${this.baseUrl}/panel`, { headers: this.headers });
+    return this.http.get<PanelItem[]>(`${this.baseUrl}/panel`);
   }
 
   createAppointmentItem(dto: AppointmentItemDto): Observable<any> {
-    return this.http.post(`${this.baseUrl}/appointmentitem/create`, dto, { headers: this.headers });
+    return this.http.post(`${this.baseUrl}/appointmentitem/create`, dto);
   }
 
   getItemsByAppointment(appointmentId: number): Observable<{ data: AppointmentItemResponse[] }> {
     return this.http.get<{ data: AppointmentItemResponse[] }>(
-      `${this.baseUrl}/appointmentitem/appointment/${appointmentId}`,
-      { headers: this.headers }
+      `${this.baseUrl}/appointmentitem/appointment/${appointmentId}`
     );
   }
 
   deleteAppointmentItem(id: number): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/appointmentitem/${id}`, { headers: this.headers });
+    return this.http.delete(`${this.baseUrl}/appointmentitem/${id}`);
   }
 }
+

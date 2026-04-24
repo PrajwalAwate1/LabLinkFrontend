@@ -44,6 +44,27 @@
   background: #c82333;
 }
 
+.btn-back-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.45rem 1rem;
+  background: transparent;
+  border: 1.5px solid #dde3ec;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #637381;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+
+.btn-back-header:hover {
+  border-color: #0066cc;
+  color: #0066cc;
+  background: #e8f4fd;
+}
+
 .header-content {
   max-width: 1400px;
   margin: 0 auto;

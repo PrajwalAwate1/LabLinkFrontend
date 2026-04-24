@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+﻿import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface LabOrderResponse {
@@ -39,28 +39,15 @@ export class TestResultService {
 
   constructor(private http: HttpClient) {}
 
-  private headers(): HttpHeaders {
-    return new HttpHeaders({ Authorization: `Bearer ${localStorage.getItem('token') ?? ''}` });
-  }
-
   getLabOrders(patientId: number): Observable<{ data: LabOrderResponse[] }> {
-    return this.http.get<{ data: LabOrderResponse[] }>(
-      `${this.base}/laborders/list?patientId=${patientId}`,
-      { headers: this.headers() }
-    );
+    return this.http.get<{ data: LabOrderResponse[] }>(`${this.base}/laborders/list?patientId=`);
   }
 
   getOrderItems(orderId: number): Observable<{ data: OrderItemResponse[] }> {
-    return this.http.get<{ data: OrderItemResponse[] }>(
-      `${this.base}/orderitems/order/${orderId}`,
-      { headers: this.headers() }
-    );
+    return this.http.get<{ data: OrderItemResponse[] }>(`${this.base}/orderitems/order/`);
   }
 
   getResults(orderItemId: number): Observable<{ data: ResultEntryResponse[] }> {
-    return this.http.get<{ data: ResultEntryResponse[] }>(
-      `${this.base}/results/order/${orderItemId}`,
-      { headers: this.headers() }
-    );
+    return this.http.get<{ data: ResultEntryResponse[] }>(`${this.base}/results/order/`);
   }
 }
