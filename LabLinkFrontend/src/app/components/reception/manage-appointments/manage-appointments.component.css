@@ -1,3 +1,9 @@
+/* ── Host ── */
+:host {
+  display: block;
+  position: relative;
+}
+
 /* ── Base ── */
 .page {
   min-height: 100vh;
@@ -351,6 +357,12 @@
   justify-content: center;
   transition: border-color .2s, color .2s, background .2s;
   color: #637381;
+  position: relative;
+  z-index: 2;
+}
+
+.btn-icon svg {
+  pointer-events: none;
 }
 
 .btn-icon.edit:hover {
@@ -366,19 +378,22 @@
 }
 
 /* ── Modal ── */
-.modal-backdrop {
+.custom-overlay {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
   background: rgba(10, 25, 41, 0.35);
-  z-index: 40;
+  z-index: 9998;
 }
 
-.modal {
+.custom-dialog {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 50;
+  z-index: 9999;
   background: #fff;
   border-radius: 16px;
   width: 100%;
@@ -386,23 +401,23 @@
   box-shadow: 0 20px 60px rgba(0,0,0,.18);
 }
 
-.modal-sm { max-width: 400px; }
+.custom-dialog-sm { max-width: 400px; }
 
-.modal-header {
+.custom-dialog-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 20px 24px 0;
 }
 
-.modal-header h3 {
+.custom-dialog-header h3 {
   font-size: 18px;
   font-weight: 700;
   color: #0a1929;
   margin: 0;
 }
 
-.modal-close {
+.custom-dialog-close {
   background: transparent;
   border: none;
   color: #94a3b8;
@@ -414,16 +429,16 @@
   justify-content: center;
   transition: color .2s, background .2s;
 }
-.modal-close:hover { color: #0a1929; background: #f1f4f8; }
+.custom-dialog-close:hover { color: #0a1929; background: #f1f4f8; }
 
-.modal-body {
+.custom-dialog-body {
   padding: 20px 24px;
   display: flex;
   flex-direction: column;
   gap: 14px;
 }
 
-.modal-footer {
+.custom-dialog-footer {
   display: flex;
   justify-content: flex-end;
   gap: 10px;

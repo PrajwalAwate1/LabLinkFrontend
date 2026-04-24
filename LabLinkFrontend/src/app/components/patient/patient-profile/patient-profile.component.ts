@@ -22,6 +22,7 @@ export class PatientProfileComponent implements OnInit {
   isSaving = false;
   successMessage = '';
   errorMessage = '';
+  today = new Date().toISOString().substring(0, 10);
 
   constructor(
     private fb: FormBuilder,
@@ -40,7 +41,7 @@ export class PatientProfileComponent implements OnInit {
       name: ['', [Validators.required, Validators.minLength(2)]],
       dob: ['', Validators.required],
       gender: ['', Validators.required],
-      contactInfo: ['', Validators.required],
+      contactInfo: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
       address: [''],
       primaryPhysicianName: ['']
     });
@@ -62,7 +63,7 @@ export class PatientProfileComponent implements OnInit {
         const p: PatientResponseDto = res.data;
         this.profileForm.patchValue({
           name: p.name ?? '',
-          dob: p.dob ? p.dob.substring(0, 10) : '',
+          dob: (p.dob && !p.dob.startsWith('0001')) ? p.dob.substring(0, 10) : this.today,
           gender: this.genderMap[p.gender ?? ''] ?? p.gender ?? '',
           contactInfo: p.contactInfo ?? '',
           address: p.address ?? '',

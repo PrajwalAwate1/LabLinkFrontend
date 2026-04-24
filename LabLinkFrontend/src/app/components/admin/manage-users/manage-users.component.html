@@ -113,7 +113,7 @@
           <tr *ngFor="let user of users">
             <td>
               <div class="user-avatar-name">
-                <div class="avatar">{{ user.name?.charAt(0)?.toUpperCase() || '?' }}</div>
+                <div class="avatar">{{ (user.name ? user.name.charAt(0).toUpperCase() : '?') }}</div>
                 <span>{{ user.name }}</span>
               </div>
             </td>

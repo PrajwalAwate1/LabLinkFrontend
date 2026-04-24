@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+﻿import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface Specimen {
@@ -28,39 +28,29 @@ export interface SpecimenCreateRequest {
   isActive: boolean;
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class SpecimenService {
   private readonly apiUrl = 'http://localhost:5290/api/Specimen';
 
   constructor(private http: HttpClient) {}
 
-  private getHeaders(): HttpHeaders {
-    const token = localStorage.getItem('token');
-    return new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    });
-  }
-
   getAll(): Observable<{ data: Specimen[] }> {
-    return this.http.get<{ data: Specimen[] }>(this.apiUrl, { headers: this.getHeaders() });
+    return this.http.get<{ data: Specimen[] }>(this.apiUrl);
   }
 
   getById(id: number): Observable<{ data: Specimen }> {
-    return this.http.get<{ data: Specimen }>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() });
+    return this.http.get<{ data: Specimen }>(`${this.apiUrl}/${id}`);
   }
 
   getByOrderId(orderId: number): Observable<{ data: Specimen[] }> {
-    return this.http.get<{ data: Specimen[] }>(`${this.apiUrl}/order/${orderId}`, { headers: this.getHeaders() });
+    return this.http.get<{ data: Specimen[] }>(`${this.apiUrl}/order/${orderId}`);
   }
 
   create(specimen: SpecimenCreateRequest): Observable<Specimen> {
-    return this.http.post<Specimen>(this.apiUrl, specimen, { headers: this.getHeaders() });
+    return this.http.post<Specimen>(this.apiUrl, specimen);
   }
 
   delete(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() });
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 }

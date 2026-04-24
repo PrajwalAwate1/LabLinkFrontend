@@ -286,14 +286,39 @@
   color: #155724;
 }
 
+.flag-badge.flag-high {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.flag-badge.flag-low {
+  background: #cce5ff;
+  color: #004085;
+}
+
+.flag-badge.flag-critical-high {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.flag-badge.flag-critical-low {
+  background: #f8d7da;
+  color: #721c24;
+}
+
 .flag-badge.flag-abnormal {
   background: #fff3cd;
   color: #856404;
 }
 
-.flag-badge.flag-panic {
-  background: #f8d7da;
-  color: #721c24;
+.flag-badge.flag-rejected {
+  background: #e2e3e5;
+  color: #383d41;
+}
+
+.flag-badge.flag-pending {
+  background: #e9ecef;
+  color: #495057;
 }
 
 .actions {

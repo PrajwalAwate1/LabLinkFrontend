@@ -21,6 +21,7 @@ export class ManageAppointmentsComponent implements OnInit {
 
   // Date filter
   filterDate = '';
+  minDateTime = new Date().toISOString().substring(0, 16);
 
   // Modal
   showModal = false;
@@ -69,7 +70,6 @@ export class ManageAppointmentsComponent implements OnInit {
   loadAppointments(): void {
     this.loading = true;
     this.error = '';
-    this.cdr.markForCheck();
 
     this.appointmentService.getAll(this.filterDate || undefined).subscribe({
       next: (res) => {
@@ -107,6 +107,7 @@ export class ManageAppointmentsComponent implements OnInit {
     };
     this.formError = '';
     this.showModal = true;
+    this.cdr.markForCheck();
   }
 
   openEditModal(appt: AppointmentDto): void {
@@ -127,10 +128,12 @@ export class ManageAppointmentsComponent implements OnInit {
     };
     this.formError = '';
     this.showModal = true;
+    this.cdr.markForCheck();
   }
 
   closeModal(): void {
     this.showModal = false;
+    this.cdr.markForCheck();
   }
 
   saveAppointment(): void {
@@ -141,7 +144,6 @@ export class ManageAppointmentsComponent implements OnInit {
 
     this.formLoading = true;
     this.formError = '';
-    this.cdr.markForCheck();
 
     const payload = { ...this.form };
 
@@ -157,8 +159,8 @@ export class ManageAppointmentsComponent implements OnInit {
           ? 'Appointment updated successfully.'
           : 'Appointment created successfully.';
         this.loadAppointments();
-        setTimeout(() => { this.successMessage = ''; this.cdr.markForCheck(); }, 4000);
         this.cdr.markForCheck();
+        setTimeout(() => { this.successMessage = ''; this.cdr.markForCheck(); }, 4000);
       },
       error: (err) => {
         this.formLoading = false;
@@ -171,17 +173,18 @@ export class ManageAppointmentsComponent implements OnInit {
   confirmDelete(appt: AppointmentDto): void {
     this.deleteId = appt.appointmentId;
     this.showDeleteConfirm = true;
+    this.cdr.markForCheck();
   }
 
   cancelDelete(): void {
     this.showDeleteConfirm = false;
     this.deleteId = null;
+    this.cdr.markForCheck();
   }
 
   deleteAppointment(): void {
     if (this.deleteId == null) return;
     this.deleteLoading = true;
-    this.cdr.markForCheck();
 
     this.appointmentService.delete(this.deleteId).subscribe({
       next: () => {
@@ -190,8 +193,8 @@ export class ManageAppointmentsComponent implements OnInit {
         this.deleteId = null;
         this.successMessage = 'Appointment deleted successfully.';
         this.loadAppointments();
-        setTimeout(() => { this.successMessage = ''; this.cdr.markForCheck(); }, 4000);
         this.cdr.markForCheck();
+        setTimeout(() => { this.successMessage = ''; this.cdr.markForCheck(); }, 4000);
       },
       error: (err) => {
         this.deleteLoading = false;

@@ -1,7 +1,6 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+﻿import { Injectable } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { AuthService } from './auth.service';
 
 export interface TestDto {
   testId: number;
@@ -38,47 +37,28 @@ export interface TestCreateRequest {
 export class TestService {
   private readonly apiUrl = 'http://localhost:5290';
 
-  constructor(private http: HttpClient, private authService: AuthService) {}
-
-  private getHeaders(): HttpHeaders {
-    const token = this.authService.getToken();
-    return new HttpHeaders({ Authorization: `Bearer ${token}` });
-  }
+  constructor(private http: HttpClient) {}
 
   getTests(name?: string, code?: string): Observable<TestDto[]> {
     let params = new HttpParams();
     if (name) params = params.set('name', name);
     if (code) params = params.set('code', code);
-    return this.http.get<TestDto[]>(`${this.apiUrl}/api/test`, {
-      headers: this.getHeaders(),
-      params
-    });
+    return this.http.get<TestDto[]>(`${this.apiUrl}/api/test`, { params });
   }
 
   getById(id: number): Observable<TestDto> {
-    return this.http.get<TestDto>(`${this.apiUrl}/api/test/${id}`, {
-      headers: this.getHeaders()
-    });
+    return this.http.get<TestDto>(`${this.apiUrl}/api/test/${id}`);
   }
 
   createTest(data: TestCreateRequest): Observable<string> {
-    return this.http.post(`${this.apiUrl}/api/test`, data, {
-      headers: this.getHeaders(),
-      responseType: 'text'
-    });
+    return this.http.post(`${this.apiUrl}/api/test`, data, { responseType: 'text' });
   }
 
   updateTest(id: number, data: TestCreateRequest): Observable<string> {
-    return this.http.put(`${this.apiUrl}/api/test/${id}`, data, {
-      headers: this.getHeaders(),
-      responseType: 'text'
-    });
+    return this.http.put(`${this.apiUrl}/api/test/${id}`, data, { responseType: 'text' });
   }
 
   deactivateTest(id: number): Observable<string> {
-    return this.http.delete(`${this.apiUrl}/api/test/${id}`, {
-      headers: this.getHeaders(),
-      responseType: 'text'
-    });
+    return this.http.delete(`${this.apiUrl}/api/test/${id}`, { responseType: 'text' });
   }
 }

@@ -112,6 +112,11 @@ export class PhlebotomistComponent implements OnInit {
 
       this.phlebotomistService.getOrderItems(order.orderId).subscribe({
         next: (items) => {
+          if (!items || items.length === 0) {
+            order.items = [];
+            this.cdr.detectChanges();
+            return;
+          }
           const specimenRequests = items.map(item =>
             this.phlebotomistService.getSpecimensByOrderItemId(item.orderItemId)
           );

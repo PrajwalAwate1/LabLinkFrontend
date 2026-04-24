@@ -255,8 +255,13 @@ export class ManageResultEntryComponent implements OnInit {
     if (!flag) return '';
     switch (flag.toLowerCase()) {
       case 'normal': return 'flag-normal';
+      case 'high': return 'flag-high';
+      case 'low': return 'flag-low';
+      case 'critical high': return 'flag-critical-high';
+      case 'critical low': return 'flag-critical-low';
       case 'abnormal': return 'flag-abnormal';
-      case 'panic': return 'flag-panic';
+      case 'rejected': return 'flag-rejected';
+      case 'pending': return 'flag-pending';
       default: return '';
     }
   }

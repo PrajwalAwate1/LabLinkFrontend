@@ -1,7 +1,6 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+﻿import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { AuthService } from './auth.service';
 
 export interface LookupItem {
   id: number;
@@ -12,28 +11,17 @@ export interface LookupItem {
 export class LookupService {
   private readonly apiUrl = 'http://localhost:5290';
 
-  constructor(private http: HttpClient, private authService: AuthService) {}
-
-  private getHeaders(): HttpHeaders {
-    const token = this.authService.getToken();
-    return new HttpHeaders({ Authorization: `Bearer ${token}` });
-  }
+  constructor(private http: HttpClient) {}
 
   getContainerTypes(): Observable<LookupItem[]> {
-    return this.http.get<LookupItem[]>(`${this.apiUrl}/api/lookup/container-types`, {
-      headers: this.getHeaders()
-    });
+    return this.http.get<LookupItem[]>(`${this.apiUrl}/api/lookup/container-types`);
   }
 
   getDepartments(): Observable<LookupItem[]> {
-    return this.http.get<LookupItem[]>(`${this.apiUrl}/api/lookup/departments`, {
-      headers: this.getHeaders()
-    });
+    return this.http.get<LookupItem[]>(`${this.apiUrl}/api/lookup/departments`);
   }
 
   getSpecimenTypes(): Observable<LookupItem[]> {
-    return this.http.get<LookupItem[]>(`${this.apiUrl}/api/lookup/specimen-types`, {
-      headers: this.getHeaders()
-    });
+    return this.http.get<LookupItem[]>(`${this.apiUrl}/api/lookup/specimen-types`);
   }
 }

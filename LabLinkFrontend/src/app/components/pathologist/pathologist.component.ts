@@ -2,6 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { Location } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 interface TestResultForReview {
@@ -61,6 +62,7 @@ export class PathologistComponent implements OnInit {
   isLoading = false;
   errorMessage = '';
   successMessage = '';
+  userName = '';
   
   // Review form
   showReviewModal = false;
@@ -71,10 +73,12 @@ export class PathologistComponent implements OnInit {
   constructor(
     private http: HttpClient,
     private router: Router,
+    private location: Location,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
+    this.userName = localStorage.getItem('userName') || 'Pathologist';
     this.loadOrders();
   }
 
@@ -293,10 +297,17 @@ export class PathologistComponent implements OnInit {
     return 'N/A';
   }
 
+  goBack(): void {
+    this.location.back();
+  }
+
   logout(): void {
     localStorage.removeItem('token');
     localStorage.removeItem('userId');
+    localStorage.removeItem('userName');
     localStorage.removeItem('roles');
+    localStorage.removeItem('patientId');
+    localStorage.removeItem('userEmail');
     this.router.navigate(['/login']);
   }
 }

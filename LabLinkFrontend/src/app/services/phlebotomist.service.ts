@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+﻿import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 export interface LabOrderResponse {
@@ -59,65 +59,44 @@ export interface UserInfo {
   name: string;
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class PhlebotomistService {
   private apiUrl = 'http://localhost:5290/api';
 
   constructor(private http: HttpClient) {}
-
-  private getHeaders(): HttpHeaders {
-    const token = localStorage.getItem('token');
-    return new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    });
-  }
 
   getLabOrders(orderDate?: string): Observable<LabOrderResponse[]> {
     let url = `${this.apiUrl}/laborders/list`;
     if (orderDate) {
       url += `?orderDate=${orderDate}`;
     }
-    return this.http.get<{ message: string; data: LabOrderResponse[] }>(url, { headers: this.getHeaders() })
+    return this.http.get<{ message: string; data: LabOrderResponse[] }>(url)
       .pipe(map(response => response.data));
   }
 
   getOrderItems(orderId: number): Observable<OrderItemResponse[]> {
     return this.http.get<{ message: string; data: OrderItemResponse[] }>(
-      `${this.apiUrl}/orderitems/order/${orderId}`,
-      { headers: this.getHeaders() }
+      `${this.apiUrl}/orderitems/order/${orderId}`
     ).pipe(map(response => response.data));
   }
 
   getSpecimensByOrderItemId(orderItemId: number): Observable<SpecimenResponse[]> {
     return this.http.get<SpecimenResponse[]>(
-      `${this.apiUrl}/Specimen/orderitem/${orderItemId}`,
-      { headers: this.getHeaders() }
+      `${this.apiUrl}/Specimen/orderitem/${orderItemId}`
     );
   }
 
   createSpecimen(dto: SpecimenCreateDto): Observable<SpecimenResponse> {
-    return this.http.post<SpecimenResponse>(
-      `${this.apiUrl}/Specimen`,
-      dto,
-      { headers: this.getHeaders() }
-    );
+    return this.http.post<SpecimenResponse>(`${this.apiUrl}/Specimen`, dto);
   }
 
-
   deleteSpecimen(specimenId: number): Observable<void> {
-    return this.http.delete<void>(
-      `${this.apiUrl}/Specimen/delete/${specimenId}`,
-      { headers: this.getHeaders() }
-    );
+    return this.http.delete<void>(`${this.apiUrl}/Specimen/delete/${specimenId}`);
   }
 
   getPatientById(patientId: number): Observable<PatientInfo> {
     return this.http.get<{ message: string; data: any }>(
-      `${this.apiUrl}/patients/${patientId}`,
-      { headers: this.getHeaders() }
+      `${this.apiUrl}/patients/${patientId}`
     ).pipe(
       map(response => ({
         patientId: response.data.patientId,
@@ -128,20 +107,21 @@ export class PhlebotomistService {
 
   getTestById(testId: number): Observable<TestInfo> {
     return this.http.get<{ message: string; data: any }>(
-      `${this.apiUrl}/Test/${testId}`,
-      { headers: this.getHeaders() }
+      `${this.apiUrl}/Test/${testId}`
     ).pipe(
-      map(response => ({
-        testId: response.data.testId,
-        testName: response.data.testName
-      }))
+      map(response => {
+        const d = response?.data ?? response;
+        return {
+          testId: d?.testId ?? testId,
+          testName: d?.testName ?? `Test #${testId}`
+        };
+      })
     );
   }
 
   getUserById(userId: number): Observable<UserInfo> {
     return this.http.get<{ message: string; data: any }>(
-      `${this.apiUrl}/User/GetUser?userId=${userId}`,
-      { headers: this.getHeaders() }
+      `${this.apiUrl}/User/GetUser?userId=${userId}`
     ).pipe(
       map(response => ({
         userId: response.data.userId,

@@ -28,7 +28,7 @@
     <div class="page-title-row">
       <div>
         <h2>Manage Bookings</h2>
-        <p>Select an appointment to create or review test/panel bookings</p>
+        <p>Select an appointment and click "Create Lab Order" to begin booking tests</p>
       </div>
     </div>
 
@@ -113,13 +113,20 @@
               </span>
             </td>
             <td>
-              <button class="btn-booking" (click)="openBookingModal(appt)" title="Create Booking">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              <button class="btn-laborder"
+                      (click)="$event.stopPropagation(); createLabOrderAndOpenModal(appt)"
+                      [disabled]="creatingLabOrderForId === appt.appointmentId"
+                      title="Create Lab Order">
+                <span class="btn-spinner" *ngIf="creatingLabOrderForId === appt.appointmentId"></span>
+                <svg *ngIf="creatingLabOrderForId !== appt.appointmentId"
+                     width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                      stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M9 11l3 3L22 4"/>
-                  <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+                  <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <line x1="12" y1="18" x2="12" y2="12"/>
+                  <line x1="9" y1="15" x2="15" y2="15"/>
                 </svg>
-                Book
+                {{ creatingLabOrderForId === appt.appointmentId ? 'Creating…' : 'Create Lab Order' }}
               </button>
             </td>
           </tr>
@@ -131,85 +138,26 @@
 </div>
 
 <!-- ── Booking Modal ── -->
-<div class="modal-backdrop" *ngIf="showBookingModal" (click)="closeBookingModal()"></div>
-<div class="modal modal-lg" *ngIf="showBookingModal">
+<div class="custom-overlay" *ngIf="showBookingModal" (click)="closeBookingModal()"></div>
+<div class="custom-dialog custom-dialog-lg" *ngIf="showBookingModal">
 
-  <div class="modal-header">
+  <div class="custom-dialog-header">
     <div>
-      <h3>Create Booking</h3>
+      <h3>Add Tests / Panels</h3>
       <p class="modal-subtitle">
-        Appointment #{{ selectedAppointment?.appointmentId }} —
+        Lab Order #{{ createdOrderId }} — Appointment #{{ selectedAppointment?.appointmentId }} —
         {{ selectedAppointment ? getPatientName(selectedAppointment.patientId) : '' }}
       </p>
     </div>
-    <button class="modal-close" (click)="closeBookingModal()">
+    <button class="custom-dialog-close" (click)="closeBookingModal()">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-           stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+           stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none">
         <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
       </svg>
     </button>
   </div>
 
-  <div class="modal-body">
-
-    <!-- ── Existing Booked Items ── -->
-    <div class="section-label">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="3" width="18" height="18" rx="2"/>
-        <path d="M3 9h18M9 21V9"/>
-      </svg>
-      Existing Booked Items
-    </div>
-
-    <div class="loading-state mini" *ngIf="existingLoading">
-      <div class="spinner"></div>
-      <span>Loading…</span>
-    </div>
-
-    <div class="existing-empty" *ngIf="!existingLoading && existingItems.length === 0">
-      No items booked yet.
-    </div>
-
-    <div class="existing-table-wrapper" *ngIf="!existingLoading && existingItems.length > 0">
-      <table class="table table-sm">
-        <thead>
-          <tr>
-            <th>Type</th>
-            <th>Name</th>
-            <th>Priority</th>
-            <th>Instructions</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let item of existingItems">
-            <td>
-              <span class="type-badge" [class.test-badge]="item.testId" [class.panel-badge]="item.panelId">
-                {{ item.testId ? 'Test' : 'Panel' }}
-              </span>
-            </td>
-            <td>{{ getItemDisplayName(item) }}</td>
-            <td class="text-muted">{{ item.priority === 0 ? 'Normal' : 'Urgent' }}</td>
-            <td class="text-muted">{{ item.instructions || '—' }}</td>
-            <td>
-              <button class="btn-icon delete" (click)="confirmDeleteItem(item.appItemId)" title="Remove">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="3 6 5 6 21 6"/>
-                  <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/>
-                  <path d="M10 11v6M14 11v6"/>
-                  <path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/>
-                </svg>
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- ── Divider ── -->
-    <div class="divider"></div>
+  <div class="custom-dialog-body">
 
     <!-- ── Add New Item ── -->
     <div class="section-label">
@@ -269,7 +217,7 @@
       </button>
     </div>
 
-    <!-- ── Pending Items (not yet saved) ── -->
+    <!-- ── Pending Items ── -->
     <div *ngIf="pendingItems.length > 0">
       <div class="section-label" style="margin-top: 8px;">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -290,7 +238,7 @@
           <span class="pending-instructions text-muted">{{ p.instructions || '—' }}</span>
           <button class="btn-icon delete" (click)="removePending(i)" title="Remove">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                 stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                 stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none">
               <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
             </svg>
           </button>
@@ -300,35 +248,12 @@
 
   </div>
 
-  <div class="modal-footer">
+  <div class="custom-dialog-footer">
     <button class="btn-ghost" (click)="closeBookingModal()">Cancel</button>
-    <button class="btn-primary" (click)="saveBooking()" [disabled]="formLoading || pendingItems.length === 0">
+    <button class="btn-primary" (click)="saveAll()"
+            [disabled]="formLoading || pendingItems.length === 0">
       <span class="btn-spinner" *ngIf="formLoading"></span>
-      {{ formLoading ? 'Saving…' : 'Save Booking (' + pendingItems.length + ')' }}
-    </button>
-  </div>
-</div>
-
-<!-- Delete Item Confirm -->
-<div class="modal-backdrop" *ngIf="showDeleteItemConfirm" (click)="cancelDeleteItem()"></div>
-<div class="modal modal-sm" *ngIf="showDeleteItemConfirm">
-  <div class="modal-header">
-    <h3>Remove Item</h3>
-    <button class="modal-close" (click)="cancelDeleteItem()">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-           stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-      </svg>
-    </button>
-  </div>
-  <div class="modal-body">
-    <p class="delete-message">Are you sure you want to remove this booking item?</p>
-  </div>
-  <div class="modal-footer">
-    <button class="btn-ghost" (click)="cancelDeleteItem()">Cancel</button>
-    <button class="btn-danger" (click)="deleteItem()" [disabled]="deleteItemLoading">
-      <span class="btn-spinner" *ngIf="deleteItemLoading"></span>
-      {{ deleteItemLoading ? 'Removing…' : 'Remove' }}
+      {{ formLoading ? 'Saving…' : 'Save (' + pendingItems.length + ')' }}
     </button>
   </div>
 </div>
